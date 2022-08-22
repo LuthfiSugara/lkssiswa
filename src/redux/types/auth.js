@@ -1,0 +1,12 @@
+export const SIGNIN = "SIGNIN";
+export const SIGNOUT = "SIGNOUT";
+export const ISLOGGEDIN = "ISLOGGEDIN";
+export const REGISTER = "REGISTER";
+export const GET_PROFILE = "GET_PROFILE";
+export const GET_ALL_USER = "GET_ALL_USER";
+export const GET_ALL_ADMIN = "GET_ALL_ADMIN";
+export const GET_ALL_GURU = "GET_ALL_GURU";
+export const GET_ALL_SISWA = "GET_ALL_SISWA";
+export const GET_DETAIL_USER = "GET_DETAIL_USER";
+export const EDIT_USER = "EDIT_USER";
+export const GETTEACHERBYID = "GETTEACHERBYID";
