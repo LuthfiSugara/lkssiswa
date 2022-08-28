@@ -237,7 +237,6 @@ export const getDetailUser = (id) => {
                             }
                         }
                     ).then(function(response){
-                        // console.log("respponse : ", response.data);
                         if(response.data.status === "success"){
                             dispatch({
                                 type: GET_DETAIL_USER,

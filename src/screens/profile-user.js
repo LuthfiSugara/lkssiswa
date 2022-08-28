@@ -23,6 +23,7 @@ const ProfileUser = ({navigation, route}) => {
 
     useEffect(() => {
         loadData();
+        
     }, [isFocused]);
 
     const redirectToEditUser = () => {
@@ -89,18 +90,21 @@ const ProfileUser = ({navigation, route}) => {
                     </View>
                     <View style={tw`bg-orange-200 p-4 rounded-lg mt-8`}>
                         <View style={tw`flex flex-row justify-between border-b border-gray-400 py-2`}>
-                            <Text style={tw`text-md font-bold`}>Username</Text>
-                            <Text style={tw`text-md text-black font-bold`}>{detail_user?.username}
+                            <Text style={tw`font-bold`}>Username</Text>
+                            <Text style={tw`text-black font-bold`}>{detail_user?.username}
                             </Text>
                         </View>
                         <View style={tw`flex flex-row justify-between border-b border-gray-400 py-2`}>
-                            <Text style={tw`text-md font-bold`}>Tanggal Lahir</Text>
-                            <Text style={tw`text-md text-black font-bold`}>{format(new Date("2022/04/15"), 'dd/MM/yyyy')}
-                            </Text>
+                            <Text style={tw`font-bold`}>Tanggal Lahir</Text>
+                            {!detail_user.tanggal_lahir ? (
+                                <Text>loading</Text>
+                            ) : (
+                                <Text style={tw`text-black font-bold`}>{format(new Date(detail_user.tanggal_lahir), 'dd/MM/yyyy')}</Text>
+                            )}
                         </View>
                         <View style={tw`flex flex-row justify-between border-b border-gray-400 py-2`}>
-                            <Text style={tw`text-md font-bold`}>Nomor Handphone</Text>
-                            <Text style={tw`text-md text-black font-bold`}>{detail_user.no_hp}</Text>
+                            <Text style={tw`font-bold`}>Nomor Handphone</Text>
+                            <Text style={tw`text-black font-bold`}>{detail_user.no_hp}</Text>
                         </View>
                     </View>
                 </View>

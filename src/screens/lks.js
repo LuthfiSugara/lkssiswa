@@ -8,7 +8,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const Home = ({navigation}) => {
+const LKS = ({navigation}) => {
 
   const dispatch = useDispatch();
 
@@ -62,41 +62,22 @@ const Home = ({navigation}) => {
       </View>
       <ScrollView style={tw`h-full p-4 bg-white`}>
         <View style={tw`flex flex-row flex-wrap justify-center`}>
-          <Pressable
-            onPress={() => navigation.navigate('User')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
-            <Icon name={'users'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Data User</Text>
-          </Pressable>
-          <Pressable 
-            onPress={() => navigation.navigate('Materi')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
-            <Icon name={'book'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Materi</Text>
-          </Pressable>
-          <Pressable 
-            onPress={() => navigation.navigate('LKS')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
+          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
             <Icon name={'file-signature'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>E-LKS</Text>
-          </Pressable>
-          <Pressable 
-            onPress={() => navigation.navigate('Setting')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
-            <Icon name={'cog'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Pengaturan</Text>
-          </Pressable>
-          <Pressable 
-            onPress={() => navigation.navigate('Nilai')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
-            <Icon name={'folder'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Nilai</Text>
-          </Pressable>
+            <Text style={tw`text-lg font-semibold text-black`}>Ulangan</Text>
+          </View>
+          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
+            <Icon name={'shapes'} size={30} color="#0096FF" />
+            <Text style={tw`text-lg font-semibold text-black`}>Latihan</Text>
+          </View>
+          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
+            <Icon name={'superscript'} size={30} color="#0096FF" />
+            <Text style={tw`text-lg font-semibold text-black`}>Tugas</Text>
+          </View>
+          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
+            <Icon name={'pencil-ruler'} size={30} color="#0096FF" />
+            <Text style={tw`text-lg font-semibold text-black`}>Kuis</Text>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -114,4 +95,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Home
+export default LKS

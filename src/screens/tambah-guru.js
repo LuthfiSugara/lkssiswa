@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
-import { dataJK, dataKelas, dataMataPelajaran } from "../redux/actions/setting-actions";
+import { dataJK, dataKelas, dataMapel } from "../redux/actions/setting-actions";
 import { Dropdown } from 'react-native-element-dropdown';
 import {launchImageLibrary} from 'react-native-image-picker';
 import { register } from "../redux/actions/auth-actions";
@@ -49,7 +49,7 @@ const TambahGuru = ({navigation, route}) => {
 
     const loadData = async() => {
         await dispatch(dataJK());
-        await dispatch(dataMataPelajaran());
+        await dispatch(dataMapel());
         await dispatch(dataKelas());
     }
 
@@ -74,7 +74,7 @@ const TambahGuru = ({navigation, route}) => {
             no_hp: '',
             id_jenis_kelamin: '',
             id_jabatan: idJabatan,
-            // pendidikan_terakhir: '',
+            pendidikan_terakhir: '',
             id_kelas: arrKelas,
             id_mapel: '',
         },
@@ -89,7 +89,7 @@ const TambahGuru = ({navigation, route}) => {
             formData.append('alamat', values.alamat);
             formData.append('id_jabatan', idJabatan);
             formData.append('id_jenis_kelamin', values.id_jenis_kelamin);
-            // formData.append('pendidikan_terakhir', values.pendidikan_terakhir);
+            formData.append('pendidikan_terakhir', values.pendidikan_terakhir);
             formData.append('id_kelas', arrKelas);
             formData.append('id_mapel', values.id_mapel);
             if(foto){
@@ -133,9 +133,9 @@ const TambahGuru = ({navigation, route}) => {
             id_jenis_kelamin: Yup
                 .string()
                 .required("Tidak boleh kosong"),
-            // pendidikan_terakhir: Yup
-            //     .string()
-            //     .required("Tidak boleh kosong"),
+            pendidikan_terakhir: Yup
+                .string()
+                .required("Tidak boleh kosong"),
             id_mapel: Yup
                 .string()
                 .required("Tidak boleh kosong"),
@@ -166,8 +166,6 @@ const TambahGuru = ({navigation, route}) => {
         if(!images.didCancel){
             setFoto(images);
             console.log("images : ",images);
-        }else{
-            console.log("images : ",images);
         }
         
     }
@@ -197,7 +195,7 @@ const TambahGuru = ({navigation, route}) => {
         }
     }
 
-    // console.log("arr kelas : ", arrKelas);
+    console.log(arrKelas[0]);
     
     return (
         <View style={tw`h-full bg-white`}>
@@ -348,7 +346,7 @@ const TambahGuru = ({navigation, route}) => {
                     }
                 </View>
 
-                {/* <View style={tw`mb-4`}>
+                <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Pendidikan Terakhir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
                         <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
@@ -361,7 +359,7 @@ const TambahGuru = ({navigation, route}) => {
                     {touched.pendidikan_terakhir && errors.pendidikan_terakhir &&
                         <Text style={tw`text-xs text-red-600`}>{errors.pendidikan_terakhir}</Text>
                     }
-                </View> */}
+                </View>
 
                 <View style={tw`mb-4`}>
                     <Text>Kelas</Text>
@@ -418,7 +416,7 @@ const TambahGuru = ({navigation, route}) => {
                 ref={refRBSheet}
                 closeOnDragDown={true}
                 closeOnPressMask={false}
-                height={500}
+                height={700}
                 customStyles={{
                     container: {
                         borderTopRightRadius: 25,
@@ -440,7 +438,6 @@ const TambahGuru = ({navigation, route}) => {
                                     <Pressable
                                         onPress={() => {
                                             selectArrKelas(kelas.id, kelas.name);
-                                            // refRBSheet.current.close();
                                         }}
                                         style={tw`${checkKelas(kelas.id) ? "border-blue-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
                                         key={index}
@@ -478,7 +475,7 @@ const TambahGuru = ({navigation, route}) => {
                 style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
                 onPress={handleSubmit}
             >
-                <Text style={tw`text-white font-semibold text-center text-lg`}>Tambah Admin</Text>
+                <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>
             </TouchableOpacity>
         </View>
     )

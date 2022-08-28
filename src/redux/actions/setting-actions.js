@@ -2,7 +2,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { baseUrl } from "../../utils/global";
 
-import { DATAKELAS, DATAJK, DATAJABATAN, DATAMAPEL } from "../types/setting";
+import { 
+    DATAKELAS, 
+    DATAJK, 
+    DATAJABATAN, 
+    DATAMAPEL,
+    GETCLASSBYTEACHERID
+} from "../types/setting";
 import { ToastAndroid } from "react-native";
 
 export const dataKelas = () => {
@@ -137,6 +143,39 @@ export const editKelas = (request, id) => async (dispatch) => {
         });
 
         return req;
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export const getClassByTeacherId = (id) => {
+    try{
+        return async dispatch => {
+            await AsyncStorage.getItem('userData')
+            .then(value => {
+                if(value != null){
+                    let data = JSON.parse(value);
+                    axios.get(
+                        `${baseUrl}/api/get-class-by-teacher-id/${id}`, 
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + data.access_token
+                            }
+                        }
+                    ).then(function(response){
+                        if(response.data.status === "success"){
+                            dispatch({
+                                type: GETCLASSBYTEACHERID,
+                                payload: response.data.data,
+                            });
+                        }
+                    }).catch(function(error){
+                        console.log(error);
+                    });
+                }
+            })
+        }
     }catch(error){
         console.log(error);
     }

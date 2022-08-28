@@ -7,11 +7,12 @@ import * as Yup from "yup";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
-import { dataJK, dataKelas, dataMataPelajaran } from "../redux/actions/setting-actions";
-import { Dropdown } from 'react-native-element-dropdown';
+import { dataJK, dataKelas, dataMapel, getClassByTeacherId } from "../redux/actions/setting-actions";
 import {launchImageLibrary} from 'react-native-image-picker';
-import { getDetailUser, register } from "../redux/actions/auth-actions";
+import { editProfileUser, getDetailUser, register } from "../redux/actions/auth-actions";
 import RBSheet from "react-native-raw-bottom-sheet";
+import {Picker} from '@react-native-picker/picker';
+import { useIsFocused } from "@react-navigation/native";
 
 const options = {
     title: "Select Image",
@@ -34,47 +35,52 @@ const EditGuru = ({navigation, route}) => {
     const dispatch = useDispatch();
     const {idJabatan, userId} = route.params;
     const refRBSheet = useRef();
+    const isFocused = useIsFocused();
 
     const [showPassword, setShowPassword] = useState(true);
-    const [isFocus, setIsFocus] = useState(false);
-    const [gender, setGender] = useState("");
     const [foto, setFoto] = useState(null);
     const [select, setSelected] = useState("");
-    const [arrKelas, setArrKelas] = useState([]);
-    const [selectArrKelasName, setSelectArrKelasName] = useState([]);
-    const [selectMapelName, setSelectMapelName] = useState("");
-    
-    const {loading, data_jk, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
-    const {detail_user} = useSelector((state) => state.userReducer);
-    const [date, setDate] = useState(new Date(format(new Date(detail_user.tanggal_lahir), 'yyyy'), format(new Date(detail_user.tanggal_lahir), 'M') - 1, format(new Date(detail_user.tanggal_lahir), 'd')));
 
-    const loadData = async() => {
+    const loadData = async () => {
         await dispatch(dataJK());
-        await dispatch(dataMataPelajaran());
+        await dispatch(dataMapel());
         await dispatch(dataKelas());
         await dispatch(getDetailUser(userId));
+        await dispatch(getClassByTeacherId(userId));
     }
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [isFocused]);
+    
+    const {loading, data_jk, data_mapel, data_kelas, class_by_teacher_id} = useSelector((state) => state.settingReducer);
+    const {detail_user} = useSelector((state) => state.userReducer);
 
+    const [date, setDate] = useState(new Date(format(new Date(detail_user?.tanggal_lahir), 'yyyy'), format(new Date(detail_user?.tanggal_lahir), 'M') - 1, format(new Date(detail_user?.tanggal_lahir), 'd')));
+    const [selectMapelName, setSelectMapelName] = useState(detail_user?.mapel?.name);
+    const [arrKelas, setArrKelas] = useState(class_by_teacher_id.kelas);
+    const [selectArrKelasName, setSelectArrKelasName] = useState(class_by_teacher_id.name);
+
+    useEffect(() => {
+        setArrKelas(class_by_teacher_id.kelas);
+        setSelectArrKelasName(class_by_teacher_id.name);
+    }, [class_by_teacher_id]);
+        
     const changeIconPassword = () => {
         showPassword === false ? setShowPassword(true) : setShowPassword(false);
     }
 
-    const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
+    const {values, setFieldValue, handleSubmit, handleReset, errors, touched, isValid} = useFormik({
         initialValues: {
             nama: detail_user.nama,
             username: detail_user.username,
             password: '',
-            tanggal_lahir: detail_user.tempat_lahir,
-            tempat_lahir: detail_user.tanggal_lahir,
+            tanggal_lahir: detail_user.tanggal_lahir,
+            tempat_lahir: detail_user.tempat_lahir,
             alamat: detail_user.alamat,
             no_hp: detail_user.no_hp,
             id_jenis_kelamin: detail_user.id_jenis_kelamin,
-            id_jabatan: idJabatan,
-            // pendidikan_terakhir: detail_user.pendidikan_terakhir,
+            pendidikan_terakhir: detail_user.pendidikan.pendidikan_terakhir,
             id_kelas: arrKelas,
             id_mapel: detail_user.id_mapel,
         },
@@ -85,13 +91,12 @@ const EditGuru = ({navigation, route}) => {
             if(values.password != ''){
                 formData.append('password', values.password);
             }
-            formData.append('tanggal_lahir', values.tempat_lahir);
+            formData.append('tanggal_lahir', values.tanggal_lahir);
             formData.append('tempat_lahir', values.tempat_lahir);
             formData.append('no_hp', values.no_hp);
             formData.append('alamat', values.alamat);
-            formData.append('id_jabatan', idJabatan);
             formData.append('id_jenis_kelamin', values.id_jenis_kelamin);
-            // formData.append('pendidikan_terakhir', values.pendidikan_terakhir);
+            formData.append('pendidikan_terakhir', values.pendidikan_terakhir);
             if(arrKelas.length > 0){
                 formData.append('id_kelas', arrKelas);
             }
@@ -103,13 +108,15 @@ const EditGuru = ({navigation, route}) => {
                     name: foto.assets[0].fileName,
                 });
             }
-            console.log("form : ",formData);
-            // dispatch(register(formData))
-            // .then(response => {
-            //     if(response.status === "success"){
-            //         navigation.goBack();
-            //     }
-            // })
+            
+            dispatch(editProfileUser(userId, formData))
+            .then(response => {
+                console.log("res : ", response);
+                if(response.status === "success"){
+                    navigation.goBack();
+                }
+            })
+            .catch(err => console.log(err));
         },
         validationSchema: Yup.object().shape({
             nama: Yup
@@ -120,8 +127,7 @@ const EditGuru = ({navigation, route}) => {
                 .required("Tidak boleh kosong!"),
             password: Yup
                 .string()
-                .min(6, "Minimal 6 karakter")
-                .required("Tidak boleh kosong"),
+                .min(6, "Minimal 6 karakter"),
             tanggal_lahir: Yup
                 .string()
                 .required("Tidak boleh kosong"),
@@ -137,9 +143,9 @@ const EditGuru = ({navigation, route}) => {
             id_jenis_kelamin: Yup
                 .string()
                 .required("Tidak boleh kosong"),
-            // pendidikan_terakhir: Yup
-            //     .string()
-            //     .required("Tidak boleh kosong"),
+            pendidikan_terakhir: Yup
+                .string()
+                .required("Tidak boleh kosong"),
             id_mapel: Yup
                 .string()
                 .required("Tidak boleh kosong"),
@@ -170,10 +176,7 @@ const EditGuru = ({navigation, route}) => {
         if(!images.didCancel){
             setFoto(images);
             console.log("images : ",images);
-        }else{
-            console.log("images : ",images);
         }
-        
     }
 
     const onSelectBottomSheet = (select) => {
@@ -201,7 +204,7 @@ const EditGuru = ({navigation, route}) => {
         }
     }
 
-    console.log("arr kelas : ", arrKelas.length);
+    console.log("arr kelas : ", arrKelas);
     
     return (
         <View style={tw`h-full bg-white`}>
@@ -209,7 +212,7 @@ const EditGuru = ({navigation, route}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Guru</Text>
+                <Text style={tw`text-center text-lg mr-5`}>Edit Guru</Text>
                 <View></View>
             </View>
 
@@ -271,7 +274,7 @@ const EditGuru = ({navigation, route}) => {
                         <Icon name={'address-book'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.tempat_lahir}
-                            onChangeText={(event) => setFieldValue('tempat_lahir', event)}s
+                            onChangeText={(event) => setFieldValue('tempat_lahir', event)}
                             style={tw`border-l border-gray-300 pl-2 w-full`}
                         />
                     </View>
@@ -326,33 +329,24 @@ const EditGuru = ({navigation, route}) => {
 
                 <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Jenis Kelamin</Text>
-                    <View style={tw`flex flex-row border border-gray-300 rounded items-center`}>
-                        <Icon name={'venus-mars'} size={20} color="#0096FF" style={tw`p-4`} />
-                        <Dropdown
-                            style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
-                            data={listJK}
-                            search={false}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField={gender}
-                            placeholder={!isFocus ? gender : '...'}
-                            value={gender}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            onChange={item => {
-                                setIsFocus(false);
-                                setFieldValue('id_jenis_kelamin', item.value);
-                                setGender(item.label);
-                                console.log()
-                            }}
-                        />
-                    </View>
+                    <Picker
+                        selectedValue={values.id_jenis_kelamin}
+                        onValueChange={(itemValue, itemIndex) =>
+                            setFieldValue('id_jenis_kelamin', itemValue)
+                        }>
+                            {data_jk.map((jk, index) => {
+                                return (
+                                    <Picker.Item label={jk.name} value={jk.id} key={index} />
+                                )
+                            })}
+                    </Picker>
+
                     {touched.id_jenis_kelamin && errors.id_jenis_kelamin &&
                         <Text style={tw`text-xs text-red-600`}>{errors.id_jenis_kelamin}</Text>
                     }
                 </View>
 
-                {/* <View style={tw`mb-4`}>
+                <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Pendidikan Terakhir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
                         <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
@@ -365,7 +359,7 @@ const EditGuru = ({navigation, route}) => {
                     {touched.pendidikan_terakhir && errors.pendidikan_terakhir &&
                         <Text style={tw`text-xs text-red-600`}>{errors.pendidikan_terakhir}</Text>
                     }
-                </View> */}
+                </View>
 
                 <View style={tw`mb-4`}>
                     <Text>Kelas</Text>
@@ -383,6 +377,11 @@ const EditGuru = ({navigation, route}) => {
                             <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
                         </View>
                     </Pressable>
+                    {arrKelas.length < 1 ? (
+                        <Text style={tw`text-xs text-red-600`}>Tidak boleh kosong</Text>
+                    ) : (
+                        null
+                    )}
                 </View>
 
                 <View style={tw`mb-4`}>
@@ -441,7 +440,6 @@ const EditGuru = ({navigation, route}) => {
                                     <Pressable
                                         onPress={() => {
                                             selectArrKelas(kelas.id, kelas.name);
-                                            // refRBSheet.current.close();
                                         }}
                                         style={tw`${checkKelas(kelas.id) ? "border-blue-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
                                         key={index}
@@ -475,12 +473,19 @@ const EditGuru = ({navigation, route}) => {
                 </ScrollView>
             </RBSheet>
 
-            <TouchableOpacity 
-                style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
-                onPress={handleSubmit}
-            >
-                <Text style={tw`text-white font-semibold text-center text-lg`}>Tambah Admin</Text>
-            </TouchableOpacity>
+            {isValid && arrKelas.length > 0 ? (
+                <TouchableOpacity 
+                    style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
+                    onPress={handleSubmit}
+                >
+                    <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>
+                </TouchableOpacity>
+            ) : (
+                <Pressable style={ tw`bg-gray-500 p-2 rounded-md mb-4 mx-4`}>
+                    <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>
+                </Pressable>
+            )}
+            
         </View>
     )
 }

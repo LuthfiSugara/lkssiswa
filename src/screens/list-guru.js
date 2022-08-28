@@ -30,7 +30,6 @@ const ListGuru = ({navigation}) => {
       })
     }
 
-    console.log("guru : ", list_guru);
   return (
     <View style={tw`h-full bg-white`}>
         <View style={tw`flex flex-row justify-between items-center p-2`}>
