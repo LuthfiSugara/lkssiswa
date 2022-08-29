@@ -25,6 +25,7 @@ import EditGuru from "../screens/edit-guru";
 import TambahMateri from "../screens/tambah-materi";
 import LKS from "../screens/lks";
 import Nilai from "../screens/nilai";
+import EditSiswa from "../screens/edit-siswa";
 
 
 const Stack = createNativeStackNavigator();
@@ -117,6 +118,13 @@ const Navigation = () => {
                     <Stack.Screen
                         name='TambahSiswa'
                         component={TambahSiswa}
+                        options={{
+                            headerShown:false
+                        }}
+                    />
+                    <Stack.Screen
+                        name='EditSiswa'
+                        component={EditSiswa}
                         options={{
                             headerShown:false
                         }}

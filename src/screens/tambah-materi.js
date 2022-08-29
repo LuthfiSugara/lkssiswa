@@ -25,9 +25,7 @@ const TambahMateri = ({navigation}) => {
     const [idKelas, setIdKelas] = useState(data_kelas.length > 0 ? data_kelas[0].id : "");
     const [idGuru, setIdGuru] = useState(teacher_by_id.length > 0 ? teacher_by_id[0].id_user : "");
 
-    // const strikethrough = require("./assets/strikethrough.png"); //icon for strikethrough
-    // const video = require("./assets/video.png"); //icon for Addvideo
-    const RichText = useRef(); //reference to the RichEditor component
+    const RichText = useRef();
     const [article, setArticle] = useState("");
 
     const loadData = async() => {
@@ -45,21 +43,9 @@ const TambahMateri = ({navigation}) => {
     }
     useEffect(() => {
         if(idMapel != "" && idKelas != ""){
-            console.log("load");
             loadTeacher();
         }
     }, [idMapel, idKelas]);
-    
-    // this function will be called when the editor has been initialized
-    function editorInitializedCallback() {
-        RichText.current?.registerToolbar(function (items) {
-        // items contain all the actions that are currently active
-        console.log(
-            "Toolbar click, selected items (insert end callback):",
-            items
-        );
-        });
-    }
 
     return (
         <View style={tw`bg-white h-full`}>
@@ -107,21 +93,26 @@ const TambahMateri = ({navigation}) => {
                         </Picker>
                     </View>
                     
-                    <View style={tw`mb-4`}>
-                        <Text style={tw`mb-1`}>Pilih Guru</Text>
-                        <Picker
-                            style={tw`shadow bg-white`}
-                            selectedValue={idGuru}
-                            onValueChange={(itemValue, itemIndex) =>
-                                setIdGuru(itemValue)
-                            }>
-                                {teacher_by_id.map((guru, index) => {
-                                    return (
-                                        <Picker.Item label={guru.user.nama} value={guru.id_user} key={index} />
-                                    )
-                                })}
-                        </Picker>
-                    </View>
+                    {teacher_by_id.length > 0 ? (
+                        <View style={tw`mb-4`}>
+                            <Text style={tw`mb-1`}>Pilih Guru</Text>
+                            <Picker
+                                style={tw`shadow bg-white`}
+                                selectedValue={idGuru}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    setIdGuru(itemValue)
+                                }>
+                                    {teacher_by_id.map((guru, index) => {
+                                        return (
+                                            <Picker.Item label={guru.user.nama} value={guru.id_user} key={index} />
+                                        )
+                                    })}
+                            </Picker>
+                        </View>
+                    ) : (
+                        null
+                    )}
+
                     {teacher_by_id.length < 1 || idKelas == "" || idMapel == "" ? (
                         <TouchableOpacity style={tw`bg-gray-500 py-2 rounded-lg mt-4`}>
                             <Text style={tw`text-white text-center text-lg`}>Lanjut</Text>
@@ -139,13 +130,13 @@ const TambahMateri = ({navigation}) => {
                         <Text style={tw`mb-1 text-gray-800`}>Judul</Text>
                         <TextInput 
                             value="asd"
-                            // onChangeText={(event) => setFieldValue('nama', event)}
+                            onChangeText={(event) => setFieldValue('judul', event)}
                             style={tw`border border-gray-300 pl-2 w-full`}
                         />
                     </View>
                     <View style={tw`mb-4`}>
                         <ScrollView >
-                            <Text style={styles.text}>Editor</Text>
+                            <Text style={styles.text}>Keterangan</Text>
 
                             <RichToolbar
                                 style={[styles.richBar]}
@@ -154,23 +145,16 @@ const TambahMateri = ({navigation}) => {
                                 iconTint={"black"}
                                 selectedIconTint={"blue"}
                                 disabledIconTint={"red"}
-                                // onPressAddImage={onPressAddImage}
                                 iconSize={20}
                                 actions={[
-                                    // "insertVideo",
                                     ...defaultActions,
-                                    // actions.setStrikethrough,
                                     actions.heading1,
                                 ]}
-                                // map icons for self made actions
                                 iconMap={{
                                     [actions.heading1]: ({ tintColor }) => (
                                         <Text style={[styles.tib, { color: tintColor }]}>H1</Text>
                                     ),
-                                    // [actions.setStrikethrough]: strikethrough,
-                                    // ["insertVideo"]: video,
                                 }}
-                                // insertVideo={insertVideo}
                             />
                             <RichEditor
                                 disabled={false}
@@ -179,8 +163,6 @@ const TambahMateri = ({navigation}) => {
                                 style={styles.rich}
                                 placeholder={"Start Writing Here"}
                                 onChange={(text) => setArticle(text)}
-                                editorInitializedCallback={editorInitializedCallback}
-                                // onHeightChange={handleHeightChange}
                             />
                             
                         </ScrollView>

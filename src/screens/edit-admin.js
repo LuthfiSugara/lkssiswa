@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { dataJK } from "../redux/actions/setting-actions";
 import { Dropdown } from 'react-native-element-dropdown';
 import {launchImageLibrary} from 'react-native-image-picker';
-import { editProfileUser, getDetailUser, getProfile, register } from "../redux/actions/auth-actions";
+import { editProfileUser, getDetailUser } from "../redux/actions/auth-actions";
+import {Picker} from '@react-native-picker/picker';
 
 const options = {
     title: "Select Image",
@@ -33,12 +34,6 @@ const EditAdmin = ({navigation, route}) => {
     const dispatch = useDispatch();
     const {userId, idJabatan} = route.params;
 
-    const [showPassword, setShowPassword] = useState(true);
-    const [date, setDate] = useState(new Date(format(new Date(), 'yyyy'), format(new Date(), 'M') - 1, format(new Date(), 'd')));
-    const [isFocus, setIsFocus] = useState(false);
-    const [gender, setGender] = useState("");
-    const [foto, setFoto] = useState(null);
-
     const {loading, data_jk} = useSelector((state) => state.settingReducer);
     const {detail_user} = useSelector((state) => state.userReducer);
 
@@ -51,11 +46,15 @@ const EditAdmin = ({navigation, route}) => {
         loadData();
     }, []);
 
+    const [showPassword, setShowPassword] = useState(true);
+    const [date, setDate] = useState(new Date(format(new Date(detail_user.tanggal_lahir), 'yyyy'), format(new Date(detail_user.tanggal_lahir), 'M') - 1, format(new Date(detail_user.tanggal_lahir), 'd')));
+    const [isFocus, setIsFocus] = useState(false);
+    const [gender, setGender] = useState("");
+    const [foto, setFoto] = useState(null);
+
     const changeIconPassword = () => {
         showPassword === false ? setShowPassword(true) : setShowPassword(false);
     }
-
-    console.log("detai user ", detail_user);
 
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
@@ -89,10 +88,10 @@ const EditAdmin = ({navigation, route}) => {
                     name: foto.assets[0].fileName,
                 });
             }
-            console.log("form",formData);
+            // console.log("form",formData);
             dispatch(editProfileUser(userId, formData))
             .then(response => {
-                console.log("res : ", response);
+                // console.log("res : ", response);
                 if(response.status === "success"){
                     navigation.goBack();
                 }
@@ -106,6 +105,9 @@ const EditAdmin = ({navigation, route}) => {
             username: Yup
                 .string()
                 .required("Tidak boleh kosong!"),
+            password: Yup
+                .string()
+                .min(6, "Minimal 6 karakter"),
             tanggal_lahir: Yup
                 .string()
                 .required("Tidak boleh kosong"),
@@ -123,8 +125,6 @@ const EditAdmin = ({navigation, route}) => {
                 .required("Tidak boleh kosong"),
         }),
     });
-
-    // console.log("values : ", values);
 
     const onChange = (event, selectedDate) => {
         setDate(selectedDate);
@@ -149,8 +149,6 @@ const EditAdmin = ({navigation, route}) => {
         const images = await launchImageLibrary(options);
         if(!images.didCancel){
             setFoto(images);
-            console.log("images : ",images);
-        }else{
             console.log("images : ",images);
         }
         
@@ -213,6 +211,9 @@ const EditAdmin = ({navigation, route}) => {
                             <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#0096FF" style={tw`p-2 py-4`} onPress={changeIconPassword} />
                         </View>
                     </View>
+                    {touched.password && errors.password &&
+                        <Text style={tw`text-xs text-red-600`}>{errors.password}</Text>
+                    }
                 </View>
 
                 <View style={tw`mb-4`}>
@@ -276,27 +277,17 @@ const EditAdmin = ({navigation, route}) => {
 
                 <View style={tw``}>
                     <Text style={tw`mb-1`}>Jenis Kelamin</Text>
-                    <View style={tw`flex flex-row border border-gray-300 rounded items-center`}>
-                        <Icon name={'venus-mars'} size={20} color="#0096FF" style={tw`p-4`} />
-                        <Dropdown
-                            style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
-                            data={listJK}
-                            search={false}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField={gender}
-                            placeholder={!isFocus ? gender : '...'}
-                            value={gender}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            onChange={item => {
-                                setIsFocus(false);
-                                setFieldValue('id_jenis_kelamin', item.value);
-                                setGender(item.label);
-                                console.log()
-                            }}
-                        />
-                    </View>
+                    <Picker
+                        selectedValue={values.id_jenis_kelamin}
+                        onValueChange={(itemValue, itemIndex) =>
+                            setFieldValue('id_jenis_kelamin', itemValue)
+                        }>
+                            {data_jk.map((jk, index) => {
+                                return (
+                                    <Picker.Item label={jk.name} value={jk.id} key={index} />
+                                )
+                            })}
+                    </Picker>
                     {touched.id_jenis_kelamin && errors.id_jenis_kelamin &&
                         <Text style={tw`text-xs text-red-600`}>{errors.id_jenis_kelamin}</Text>
                     }

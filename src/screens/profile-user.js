@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from 'react-redux'
-import { getDetailUser, getProfile } from '../redux/actions/auth-actions';
+import { getDetailUser } from '../redux/actions/auth-actions';
 import { baseUrl } from "../utils/global";
 import tw from "twrnc";
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -37,9 +37,14 @@ const ProfileUser = ({navigation, route}) => {
                 userId: userId,
                 idJabatan: idJabatan
             });
+        }else if(idJabatan == 3){
+            navigation.navigate('EditSiswa', {
+                userId: userId,
+                idJabatan: idJabatan
+            });
         }
     }
-
+    // console.log("detail : ", detail_user.map());
     return (
         <View style={styles.container}>
             <ScrollView>
@@ -82,7 +87,11 @@ const ProfileUser = ({navigation, route}) => {
                         {detail_user?.jabatan?.name === "Siswa" ? (
                             <View>
                                 <Text style={tw`text-sm font-bold`}>Kelas</Text>
-                                <Text style={tw`text-sm font-bold text-black text-center`}>{detail_user?.kelas?.name}</Text>
+                                <Text style={tw`text-sm font-bold text-black text-center`}>{detail_user.kelas.map((detail, index) => {
+                                    return (
+                                        detail.detail.name
+                                    )
+                                })}</Text>
                             </View>
                         ) : (
                             null

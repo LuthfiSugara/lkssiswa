@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import tw from "twrnc";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useFormik } from "formik";
@@ -7,10 +7,12 @@ import * as Yup from "yup";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
-import { dataJK } from "../redux/actions/setting-actions";
-import { Dropdown } from 'react-native-element-dropdown';
+import { dataJK, dataKelas } from "../redux/actions/setting-actions";
+import { editProfileUser, getDetailUser } from '../redux/actions/auth-actions';
 import {launchImageLibrary} from 'react-native-image-picker';
-import { register } from "../redux/actions/auth-actions";
+import RBSheet from "react-native-raw-bottom-sheet";
+import {Picker} from '@react-native-picker/picker';
+import { baseUrl } from "../utils/global";
 
 const options = {
     title: "Select Image",
@@ -29,25 +31,31 @@ const listJK = [
     { label: 'Perempuan', value: '2' },
 ];
 
-const TambahAdmin = ({navigation, route}) => {
+const EditSiswa = ({navigation, route}) => {
     const dispatch = useDispatch();
-    const {idJabatan} = route.params;
+    const {userId, idJabatan} = route.params;
+    const refRBSheet = useRef();
 
-    const [showPassword, setShowPassword] = useState(true);
-    const [date, setDate] = useState(new Date(format(new Date(), 'yyyy'), format(new Date(), 'M') - 1, format(new Date(), 'd')));
-    const [isFocus, setIsFocus] = useState(false);
-    const [gender, setGender] = useState("");
-    const [foto, setFoto] = useState(null);
-
-    const {loading, data_jk} = useSelector((state) => state.settingReducer);
+    const {loading, data_kelas, data_jk} = useSelector((state) => state.settingReducer);
+    const {detail_user} = useSelector((state) => state.userReducer);
 
     const loadData = async() => {
+        await dispatch(dataKelas());
         await dispatch(dataJK());
+        await getDetailUser(userId);
     }
 
     useEffect(() => {
         loadData();
     }, []);
+
+    const [showPassword, setShowPassword] = useState(true);
+    const [date, setDate] = useState(new Date(format(new Date(detail_user.tanggal_lahir), 'yyyy'), format(new Date(detail_user.tanggal_lahir), 'M') - 1, format(new Date(detail_user.tanggal_lahir), 'd')));
+    const [isFocus, setIsFocus] = useState(false);
+    const [foto, setFoto] = useState(null);
+    const [select, setSelected] = useState("");
+    const [kelasName, setKelasName] = useState(detail_user.kelas[0].detail.name);
+    const [previewImage, setPreviewImage] = useState(baseUrl + detail_user.foto);
 
     const changeIconPassword = () => {
         showPassword === false ? setShowPassword(true) : setShowPassword(false);
@@ -55,27 +63,39 @@ const TambahAdmin = ({navigation, route}) => {
 
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
-            nama: '',
-            username: '',
+            nama: detail_user.nama,
+            username: detail_user.username,
             password: '',
-            tanggal_lahir: '',
-            tempat_lahir: '',
-            alamat: '',
-            no_hp: '',
-            id_jenis_kelamin: '',
-            id_jabatan: idJabatan,
+            tanggal_lahir: detail_user.tanggal_lahir,
+            tempat_lahir: detail_user.tempat_lahir,
+            alamat: detail_user.alamat,
+            no_hp: detail_user.no_hp,
+            id_jenis_kelamin: detail_user.id_jenis_kelamin,
+            id_kelas: detail_user.kelas[0].id_kelas,
+            nama_ayah: detail_user?.siswa?.nama_ayah,
+            nama_ibu: detail_user?.siswa?.nama_ibu,
+            pekerjaan_ayah: detail_user?.siswa?.pekerjaan_ayah,
+            pekerjaan_ibu: detail_user?.siswa?.pekerjaan_ibu,
         },
         onSubmit: values => {
             const formData = new FormData();
             formData.append('nama', values.nama);
             formData.append('username', values.username);
-            formData.append('password', values.password);
+            if(values.password != ''){
+                formData.append('password', values.password);
+            }
             formData.append('tanggal_lahir', values.tanggal_lahir);
             formData.append('tempat_lahir', values.tempat_lahir);
             formData.append('no_hp', values.no_hp);
             formData.append('alamat', values.alamat);
             formData.append('id_jabatan', idJabatan);
             formData.append('id_jenis_kelamin', values.id_jenis_kelamin);
+            formData.append('id_kelas', values.id_kelas);
+            formData.append('nama_ayah', values.nama_ayah);
+            formData.append('nama_ibu', values.nama_ibu);
+            formData.append('pekerjaan_ayah', values.pekerjaan_ayah);
+            formData.append('pekerjaan_ibu', values.pekerjaan_ibu);
+
             if(foto){
                 formData.append('foto', {
                     uri: foto.assets[0].uri,
@@ -84,12 +104,13 @@ const TambahAdmin = ({navigation, route}) => {
                 });
             }
             
-            dispatch(register(formData))
+            dispatch(editProfileUser(userId, formData))
             .then(response => {
                 if(response.status === "success"){
                     navigation.goBack();
                 }
             })
+            .catch(err => console.log(err));
         },
         validationSchema: Yup.object().shape({
             nama: Yup
@@ -100,8 +121,7 @@ const TambahAdmin = ({navigation, route}) => {
                 .required("Tidak boleh kosong!"),
             password: Yup
                 .string()
-                .min(6, "Minimal 6 karakter")
-                .required("Tidak boleh kosong"),
+                .min(6, "Minimal 6 karakter"),
             tanggal_lahir: Yup
                 .string()
                 .required("Tidak boleh kosong"),
@@ -115,6 +135,21 @@ const TambahAdmin = ({navigation, route}) => {
                 .string()
                 .required("Tidak boleh kosong"),
             id_jenis_kelamin: Yup
+                .string()
+                .required("Tidak boleh kosong"),
+            id_kelas: Yup
+                .string()
+                .required("Tidak boleh kosong"),
+            nama_ayah: Yup
+                .string()
+                .required("Tidak boleh kosong"),
+            nama_ibu: Yup
+                .string()
+                .required("Tidak boleh kosong"),
+            pekerjaan_ayah: Yup
+                .string()
+                .required("Tidak boleh kosong"),
+            pekerjaan_ibu: Yup
                 .string()
                 .required("Tidak boleh kosong"),
         }),
@@ -146,6 +181,14 @@ const TambahAdmin = ({navigation, route}) => {
         }
         
     }
+
+    const onSelectBottomSheet = (select) => {
+        setSelected(select);
+        console.log("select : ", select);
+        refRBSheet.current.open();
+    }
+
+    console.log("preview : ", previewImage);
     
     return (
         <View style={tw`h-full bg-white`}>
@@ -153,7 +196,7 @@ const TambahAdmin = ({navigation, route}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Admin</Text>
+                <Text style={tw`text-center text-lg mr-5`}>Edit Siswa</Text>
                 <View></View>
             </View>
 
@@ -268,50 +311,168 @@ const TambahAdmin = ({navigation, route}) => {
                     }
                 </View>
 
-                <View style={tw``}>
+                <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Jenis Kelamin</Text>
-                    <View style={tw`flex flex-row border border-gray-300 rounded items-center`}>
-                        <Icon name={'venus-mars'} size={20} color="#0096FF" style={tw`p-4`} />
-                        <Dropdown
-                            style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
-                            data={listJK}
-                            search={false}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField={gender}
-                            placeholder={!isFocus ? gender : '...'}
-                            value={gender}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            onChange={item => {
-                                setIsFocus(false);
-                                setFieldValue('id_jenis_kelamin', item.value);
-                                setGender(item.label);
-                                console.log()
-                            }}
-                        />
-                    </View>
+                    <Picker
+                        selectedValue={values.id_jenis_kelamin}
+                        onValueChange={(itemValue, itemIndex) =>
+                            setFieldValue('id_jenis_kelamin', itemValue)
+                        }>
+                            {data_jk.map((jk, index) => {
+                                return (
+                                    <Picker.Item label={jk.name} value={jk.id} key={index} />
+                                )
+                            })}
+                    </Picker>
                     {touched.id_jenis_kelamin && errors.id_jenis_kelamin &&
                         <Text style={tw`text-xs text-red-600`}>{errors.id_jenis_kelamin}</Text>
+                    }
+                </View>
+
+                <View style={tw`mb-4`}>
+                    <Text>Kelas</Text>
+                    <Pressable 
+                        style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}
+                        onPress={() => onSelectBottomSheet("kelas")} 
+                    >
+                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
+                            <Icon name={'university'} size={20} color="#0096FF" style={tw`p-4`} />
+                        </View>
+                        <Text style={tw`w-4/5 px-2`}>{kelasName}</Text>
+                        <View style={[styles.w10, tw`h-full`]}>
+                            <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
+                        </View>
+                    </Pressable>
+                    {touched.id_kelas && errors.id_kelas &&
+                        <Text style={tw`text-xs text-red-600`}>{errors.id_kelas}</Text>
+                    }
+                </View>
+
+                <View style={tw`mb-4`}>
+                    <Text>Nama Ayah</Text>
+                    <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
+                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
+                        <TextInput
+                            value={values.nama_ayah}
+                            onChangeText={(event) => setFieldValue('nama_ayah', event)}
+                            style={tw`border-l border-gray-300 pl-2 w-full`}
+                        />
+                    </View>
+                    {touched.nama_ayah && errors.nama_ayah &&
+                        <Text style={tw`text-xs text-red-600`}>{errors.nama_ayah}</Text>
+                    }
+                </View>
+
+                <View style={tw`mb-4`}>
+                    <Text>Pekerjaan Ayah</Text>
+                    <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
+                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
+                        <TextInput
+                            value={values.pekerjaan_ayah}
+                            onChangeText={(event) => setFieldValue('pekerjaan_ayah', event)}
+                            style={tw`border-l border-gray-300 pl-2 w-full`}
+                        />
+                    </View>
+                    {touched.pekerjaan_ayah && errors.pekerjaan_ayah &&
+                        <Text style={tw`text-xs text-red-600`}>{errors.pekerjaan_ayah}</Text>
+                    }
+                </View>
+
+                <View style={tw`mb-4`}>
+                    <Text>Nama Ibu</Text>
+                    <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
+                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
+                        <TextInput
+                            value={values.nama_ibu}
+                            onChangeText={(event) => setFieldValue('nama_ibu', event)}
+                            style={tw`border-l border-gray-300 pl-2 w-full`}
+                        />
+                    </View>
+                    {touched.nama_ibu && errors.nama_ibu &&
+                        <Text style={tw`text-xs text-red-600`}>{errors.nama_ibu}</Text>
+                    }
+                </View>
+
+                <View style={tw`mb-4`}>
+                    <Text>Pekerjaan Ibu</Text>
+                    <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
+                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
+                        <TextInput
+                            value={values.pekerjaan_ibu}
+                            onChangeText={(event) => setFieldValue('pekerjaan_ibu', event)}
+                            style={tw`border-l border-gray-300 pl-2 w-full`}
+                        />
+                    </View>
+                    {touched.pekerjaan_ibu && errors.pekerjaan_ibu &&
+                        <Text style={tw`text-xs text-red-600`}>{errors.pekerjaan_ibu}</Text>
                     }
                 </View>
 
                 <View style={tw`flex flex-row justify-center mt-4 mb-12`}>
                     <TouchableOpacity
                         onPress={openGallery}
-                        style={[styles.shadowUpload, tw`w-1/3 rounded-full p-4`]}
+                        style={[styles.shadowUpload, tw`w-1/2 rounded-full p-4`]}
                     >
-                        <Icon name={'cloud-upload-alt'} size={50} color="#0096FF" style={tw`px-3 text-center`} />
-                        <Text style={tw`text-center`}>Upload Foto</Text>
+                        <View style={tw`w-full flex flex-row justify-center`}>
+                        <Image
+                            style={tw`w-3/4 h-32 rounded`}
+                            source={{
+                                uri: previewImage,
+                            }}
+                        />
+                    </View>
+                        <Text style={tw`text-center text-black mt-1`}>Upload Foto</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+
+            <RBSheet
+                ref={refRBSheet}
+                closeOnDragDown={true}
+                closeOnPressMask={false}
+                height={500}
+                customStyles={{
+                    container: {
+                        borderTopRightRadius: 25,
+                        borderTopLeftRadius: 25,
+                    },
+                    wrapper: {
+                        backgroundColor: "transparent",
+                    },
+                    draggableIcon: {
+                        backgroundColor: "#000"
+                    }
+                }}
+            >
+                <ScrollView style={tw`p-4`}>
+                    {select === "kelas" ? (
+                        <View style={tw`flex flex-row flex-wrap `}>
+                            {data_kelas.map((kelas, index) => {
+                                return (
+                                    <Pressable
+                                        onPress={() => {
+                                            setKelasName(kelas.name);
+                                            setFieldValue('id_kelas', kelas.id);
+                                        }}
+                                        style={tw`${kelas.id == values.id_kelas ? "border-blue-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
+                                        key={index}
+                                     >
+                                        <Text>{kelas.name}</Text>
+                                    </Pressable>
+                                )
+                            })}
+                        </View>
+                    ) : (
+                        null
+                    )}
+                </ScrollView>
+            </RBSheet>
 
             <TouchableOpacity 
                 style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
                 onPress={handleSubmit}
             >
-                <Text style={tw`text-white font-semibold text-center text-lg`}>Tambah Admin</Text>
+                <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>
             </TouchableOpacity>
         </View>
     )
@@ -338,4 +499,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default TambahAdmin;
+export default EditSiswa;
