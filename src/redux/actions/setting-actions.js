@@ -3,10 +3,12 @@ import axios from "axios";
 import { baseUrl } from "../../utils/global";
 
 import { 
-    DATAKELAS, 
+    DATAKELAS,
+    DETAILKELAS,
     DATAJK, 
     DATAJABATAN, 
     DATAMAPEL,
+    DETAILMAPEL,
     GETCLASSBYTEACHERID
 } from "../types/setting";
 import { ToastAndroid } from "react-native";
@@ -356,7 +358,6 @@ export const editMataPelajaran = (request, id) => async (dispatch) => {
                 }
             }
         ).then(function(response){
-            console.log("response : ", response.data);
             if(response.data.status === "success"){
                 ToastAndroid.showWithGravityAndOffset(
                     response.data.message,

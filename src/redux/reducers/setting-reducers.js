@@ -3,12 +3,14 @@ import {
     DATAKELAS, 
     DATAJABATAN, 
     DATAMAPEL,
-    GETCLASSBYTEACHERID
+    GETCLASSBYTEACHERID,
+    DETAILKELAS,
 } from "../types/setting";
 
 const initialState = {
     loading: true,
     data_kelas: [],
+    detail_kelas: [],
     data_jk: [],
     data_jabatan: [],
     data_mapel: [],
@@ -28,6 +30,12 @@ const settingReducer = (state = initialState, action) => {
                 ...state,
                 loading: false,
                 class_by_teacher_id: action.payload
+            }
+        case DETAILKELAS:
+            return {
+                ...state,
+                loading: false,
+                detail_kelas: action.payload
             }
         case DATAJK:
             return {

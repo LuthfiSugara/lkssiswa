@@ -61,8 +61,6 @@ const TambahGuru = ({navigation, route}) => {
         showPassword === false ? setShowPassword(true) : setShowPassword(false);
     }
 
-    // console.log("id jabatan ", idJabatan);
-
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
             nama: '',

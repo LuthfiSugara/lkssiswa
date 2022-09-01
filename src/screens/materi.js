@@ -18,8 +18,6 @@ const Materi = ({navigation}) => {
         loadData();
     }, []);
 
-    console.log(data_mapel);
-
     return (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
@@ -32,6 +30,13 @@ const Materi = ({navigation}) => {
 
             <ScrollView style={tw`h-full p-4 bg-white`}>
                 <View style={tw`flex flex-row flex-wrap justify-center`}>
+                    <Pressable
+                        onPress={() => navigation.navigate('ListMateri')}
+                        style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+                    >
+                        <Icon name={'book'} size={30} color="#0096FF" />
+                        <Text style={tw`text-lg font-semibold text-black`}>Materi</Text>
+                    </Pressable>
                     <Pressable
                         onPress={() => navigation.navigate('TambahMateri')}
                         style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}

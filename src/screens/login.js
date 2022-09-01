@@ -23,7 +23,6 @@ const Login = ({navigation}) => {
         let token = "123123";
         await dispatch(signIn(token));
     }
-    console.log("url : ",baseUrl);
 
     return (
         <View style={tw`bg-white flex-1 justify-center px-4`}>

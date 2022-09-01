@@ -26,6 +26,9 @@ import TambahMateri from "../screens/tambah-materi";
 import LKS from "../screens/lks";
 import Nilai from "../screens/nilai";
 import EditSiswa from "../screens/edit-siswa";
+import ListMateri from "../screens/list-materi";
+import DetailMateri from "../screens/detail-materi";
+import EditMateri from "../screens/edit-materi";
 
 
 const Stack = createNativeStackNavigator();
@@ -188,6 +191,27 @@ const Navigation = () => {
                     <Stack.Screen
                         name='TambahMateri'
                         component={TambahMateri}
+                        options={{
+                            headerShown:false
+                        }}
+                    />
+                    <Stack.Screen
+                        name='ListMateri'
+                        component={ListMateri}
+                        options={{
+                            headerShown:false
+                        }}
+                    />
+                    <Stack.Screen
+                        name='DetailMateri'
+                        component={DetailMateri}
+                        options={{
+                            headerShown:false
+                        }}
+                    />
+                    <Stack.Screen
+                        name='EditMateri'
+                        component={EditMateri}
                         options={{
                             headerShown:false
                         }}
