@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getProfile, signOut } from '../redux/actions/auth-actions';
@@ -6,7 +6,7 @@ import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { dataKelas } from '../redux/actions/setting-actions';
+import { dataKelas, dataMapel } from '../redux/actions/setting-actions';
 
 
 const Nilai = ({navigation}) => {
@@ -14,47 +14,69 @@ const Nilai = ({navigation}) => {
   const dispatch = useDispatch();
 
   const {loading, profile} = useSelector((state) => state.userReducer);
-  const {data_kelas} = useSelector((state) => state.settingReducer);
+  const {data_kelas, data_mapel} = useSelector((state) => state.settingReducer);
 
   const loadData = async() => {
       await dispatch(getProfile());
       await dispatch(dataKelas());
+      await dispatch(dataMapel());
   }
-  const [isFocus, setIsFocus] = useState(false);
+  const [step, setStep] = useState(1);
+  const [idKelas, setIdKelas] = useState(0);
 
   useEffect(() => {
     loadData();
   }, []);
     
-
-  const data = [
-    { label: 'Profile', value: profile?.nama_lengkap },
-    { label: 'Logout', value: profile?.nama_lengkap },
-  ];
-
-  const redirectToDetail = (id, idJabatan) => {
-    navigation.navigate('ProfileUser', {
-      userId: id,
-      idJabatan: idJabatan,
-    });
-  }
-  console.log(data_kelas);
       
   return (
-    <View>
-      <ScrollView style={tw`h-full p-4 bg-white`}>
-          <View style={tw`flex flex-row flex-wrap justify-center`}>
-        {data_kelas.map((kelas, index) => {
-            return (
-                <View
-                    // onPress={() => navigation.navigate('User')}
-                    style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+    <View style={tw`h-full bg-white`}>
+      <View style={tw`flex flex-row justify-between items-center p-2`}>
+          <Pressable style={tw`py-2 px-4 rounded-full shadow bg-white`} onPress={() => {
+            step == 2 ? setStep(1) : navigation.goBack();
+          }}>
+              <Icon name={'angle-left'} size={25} color="#000000" />
+          </Pressable>
+          <Text style={tw`text-center text-lg mr-5`}>Nilai</Text>
+          <View></View>
+      </View>
+
+      <ScrollView style={tw`mt-4`}>
+        <View style={tw`flex flex-row flex-wrap justify-center`}>
+          {step == 1 ? (
+            data_kelas.map((kelas, index) => {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    setStep(2);
+                    setIdKelas(kelas.id);
+                  }}
+                  style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
                 >
-                    <Icon name={'users'} size={30} color="#0096FF" />
-                    <Text style={tw`text-lg font-semibold text-black`}>{kelas.name}</Text>
-                </View>
-            )
-        })}
+                  <Icon name={'users'} size={30} color="#0096FF" />
+                  <Text style={tw`text-lg font-semibold text-black`}>{kelas.name}</Text>
+                </TouchableOpacity>
+              )
+            })
+          ) : (
+            data_mapel.map((kelas, index) => {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('NilaiSiswa', {
+                    id_kelas: idKelas,
+                    id_mapel: kelas.id,
+                  })}
+                  style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+                >
+                  <Icon name={'users'} size={30} color="#0096FF" />
+                  <Text style={tw`text-lg font-semibold text-black`}>{kelas.name}</Text>
+                </TouchableOpacity>
+              )
+            })
+          )}
+          
         </View>
       </ScrollView>
     </View>

@@ -3,7 +3,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpa
 import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch, useSelector } from "react-redux";
-import { addNewMapel, dataMataPelajaran, editMataPelajaran } from "../redux/actions/setting-actions";
+import { addNewMapel, dataMapel, editMataPelajaran } from "../redux/actions/setting-actions";
 
 const ListMapel = ({navigation}) => {
     const dispatch = useDispatch();
@@ -16,7 +16,7 @@ const ListMapel = ({navigation}) => {
     const {loading, data_mapel} = useSelector((state) => state.settingReducer);
 
     const loadData = async() => {
-        await dispatch(dataMataPelajaran());
+        await dispatch(dataMapel());
     }
 
     useEffect(() => {

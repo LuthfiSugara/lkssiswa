@@ -14,7 +14,7 @@ import {
 } from "../types/auth";
 
 const initialState = {
-    loading: true,
+    load_auth: true,
     access_token: "",
     sign_out: "",
     is_logged_in: true,
@@ -34,67 +34,67 @@ const userReducer = (state = initialState, action) => {
         case SIGNIN:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 access_token: action.payload
             }
         case SIGNOUT:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 is_logged_in: action.payload
             }
         case REGISTER:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 // message: action.payload
             }
         case ISLOGGEDIN:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 is_logged_in: action.payload
             }
         case GET_PROFILE:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 profile: action.payload
             }
         case GET_ALL_USER:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 list_user: action.payload
             }
         case GET_ALL_ADMIN:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 list_admin: action.payload
             }
         case GET_ALL_GURU:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 list_guru: action.payload
             }
         case GET_ALL_SISWA:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 list_siswa: action.payload
             }
         case GET_DETAIL_USER:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 detail_user: action.payload
             }
         case GETTEACHERBYID:
             return {
                 ...state,
-                loading: false,
+                load_auth: false,
                 teacher_by_id: action.payload
             }
         default: 

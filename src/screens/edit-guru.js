@@ -13,6 +13,7 @@ import { editProfileUser, getDetailUser, register } from "../redux/actions/auth-
 import RBSheet from "react-native-raw-bottom-sheet";
 import {Picker} from '@react-native-picker/picker';
 import { useIsFocused } from "@react-navigation/native";
+import { customStyle } from "../utils/style";
 
 const options = {
     title: "Select Image",
@@ -97,7 +98,7 @@ const EditGuru = ({navigation, route}) => {
             formData.append('alamat', values.alamat);
             formData.append('id_jenis_kelamin', values.id_jenis_kelamin);
             formData.append('pendidikan_terakhir', values.pendidikan_terakhir);
-            if(arrKelas.length > 0){
+            if(arrKelas && arrKelas.length > 0){
                 formData.append('id_kelas', arrKelas);
             }
             formData.append('id_mapel', values.id_mapel);
@@ -203,8 +204,6 @@ const EditGuru = ({navigation, route}) => {
             return true;
         }
     }
-
-    console.log("arr kelas : ", arrKelas);
     
     return (
         <View style={tw`h-full bg-white`}>
@@ -251,16 +250,16 @@ const EditGuru = ({navigation, route}) => {
                     <Text>Password</Text>
                     <View style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}>
                         <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'lock'} size={20} color="#0096FF" style={tw`p-4`} />
+                            <Icon name={'user'} size={20} color="#0096FF" style={tw`p-4`} />
                         </View>
                         <TextInput
                             value={values.password}
                             onChangeText={(event) => setFieldValue('password', event)}
                             secureTextEntry={showPassword}
-                            style={tw`w-4/5 px-2`}
+                            style={[tw`px-2`, customStyle.w80]}
                         />
                         <View style={[styles.w10, tw`border-l border-gray-300 h-full`]}>
-                            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#0096FF" style={tw`p-2 py-4`} onPress={changeIconPassword} />
+                            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#0096FF" style={tw`px-2 py-4`} onPress={changeIconPassword} />
                         </View>
                     </View>
                     {touched.password && errors.password &&
@@ -372,12 +371,12 @@ const EditGuru = ({navigation, route}) => {
                         </View>
                         <Text
                             style={tw`w-4/5 px-2`}
-                        >{selectArrKelasName.length > 2 ? selectArrKelasName.toString() + '...' : selectArrKelasName.toString()}</Text>
+                        >{selectArrKelasName && selectArrKelasName.length > 2 ? selectArrKelasName.toString() + '...' : selectArrKelasName}</Text>
                         <View style={[styles.w10, tw`h-full`]}>
                             <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
                         </View>
                     </Pressable>
-                    {arrKelas.length < 1 ? (
+                    {arrKelas && arrKelas.length < 1 ? (
                         <Text style={tw`text-xs text-red-600`}>Tidak boleh kosong</Text>
                     ) : (
                         null
@@ -473,7 +472,7 @@ const EditGuru = ({navigation, route}) => {
                 </ScrollView>
             </RBSheet>
 
-            {isValid && arrKelas.length > 0 ? (
+            {isValid && arrKelas && arrKelas.length > 0 ? (
                 <TouchableOpacity 
                     style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
                     onPress={handleSubmit}

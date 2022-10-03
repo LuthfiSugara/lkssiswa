@@ -149,7 +149,6 @@ const EditAdmin = ({navigation, route}) => {
         const images = await launchImageLibrary(options);
         if(!images.didCancel){
             setFoto(images);
-            console.log("images : ",images);
         }
         
     }

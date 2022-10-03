@@ -1,83 +1,54 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getProfile, signOut } from '../redux/actions/auth-actions';
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native'
+import React from 'react'
 import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Dropdown } from 'react-native-element-dropdown';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const LKS = ({navigation}) => {
 
-  const dispatch = useDispatch();
-
-  const {loading, profile} = useSelector((state) => state.userReducer);
-
-  const loadData = async() => {
-      await dispatch(getProfile());
-  }
-  const [isFocus, setIsFocus] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-    
-
-  const data = [
-    { label: 'Profile', value: profile?.nama_lengkap },
-    { label: 'Logout', value: profile?.nama_lengkap },
-  ];
-
-  const redirectToDetail = (id, idJabatan) => {
-    navigation.navigate('ProfileUser', {
-      userId: id,
-      idJabatan: idJabatan,
+  const redirectToCreateSoal = (id) => {
+    navigation.navigate('Soal', {
+      id_soal: id
     });
   }
       
   return (
-    <View>
-      <View style={tw`p-4`}>
-        <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
-          data={data}
-          search={false}
-          maxHeight={300}
-          labelField="label"
-          valueField={profile?.nama_lengkap}
-          placeholder={!isFocus ? profile?.nama_lengkap : '...'}
-          value={profile?.nama_lengkap}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
-            setIsFocus(false);
-            if(item.label == "Logout"){
-              dispatch(signOut());
-            }else if(item.label == "Profile"){
-              redirectToDetail(profile?.id, profile.id_jabatan);
-            }
-          }}
-        />
+    <View style={tw`flex-1 justify-center`}>
+      <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>
+          <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
+              <Icon name={'angle-left'} size={25} color="#000000" />
+          </Pressable>
+          <Text style={tw`text-center text-lg mr-5`}>Ujian</Text>
+          <View></View>
       </View>
+
       <ScrollView style={tw`h-full p-4 bg-white`}>
         <View style={tw`flex flex-row flex-wrap justify-center`}>
-          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-            <Icon name={'file-signature'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Ulangan</Text>
-          </View>
-          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-            <Icon name={'shapes'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Latihan</Text>
-          </View>
-          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-            <Icon name={'superscript'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Tugas</Text>
-          </View>
-          <View style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-            <Icon name={'pencil-ruler'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Kuis</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => redirectToCreateSoal(1)} 
+            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+          >
+              <Icon name={'file-signature'} size={30} color="#0096FF" />
+              <Text style={tw`text-lg font-semibold text-black`}>Ulangan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => redirectToCreateSoal(2)} 
+            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
+              <Icon name={'shapes'} size={30} color="#0096FF" />
+              <Text style={tw`text-lg font-semibold text-black`}>Latihan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => redirectToCreateSoal(3)} 
+            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
+              <Icon name={'superscript'} size={30} color="#0096FF" />
+              <Text style={tw`text-lg font-semibold text-black`}>Tugas</Text>
+            </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => redirectToCreateSoal(4)} 
+            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
+              <Icon name={'pencil-ruler'} size={30} color="#0096FF" />
+              <Text style={tw`text-lg font-semibold text-black`}>Kuis</Text>
+            </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

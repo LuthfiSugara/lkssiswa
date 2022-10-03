@@ -117,6 +117,8 @@ const TambahMateri = ({navigation}) => {
         }),
     });
 
+    console.log("teacher : ", teacher_by_id);
+
     return (
         <View style={tw`bg-white h-full`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>

@@ -192,8 +192,6 @@ const TambahGuru = ({navigation, route}) => {
             return true;
         }
     }
-
-    console.log(arrKelas[0]);
     
     return (
         <View style={tw`h-full bg-white`}>

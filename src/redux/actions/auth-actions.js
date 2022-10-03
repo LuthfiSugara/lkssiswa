@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { ToastAndroid } from "react-native";
 import { baseUrl } from "../../utils/global";
+import { UseGetAction } from "../../utils/use-get-action";
 
 import {
     SIGNIN,
@@ -187,39 +188,12 @@ export const register = (request) => async (dispatch) => {
     }
 }
 
-export const getProfile = () => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/profile`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        // console.log("respponse : ", response.data);
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GET_PROFILE,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getProfile = () => 
+    UseGetAction(
+        'profile',
+        GET_PROFILE, 
+        undefined,
+    );
 
 export const getDetailUser = (id) => {
     try{
@@ -254,39 +228,12 @@ export const getDetailUser = (id) => {
     }
 }
 
-export const getAllUser = () => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/all-user`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        console.log("response data user : ", response.data);
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GET_ALL_USER,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getAllUser = () => 
+    UseGetAction(
+        'all-user',
+        GET_ALL_USER, 
+        undefined,
+    );
 
 export const getAllAdmin = () => {
     try{

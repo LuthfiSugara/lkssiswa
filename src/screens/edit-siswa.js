@@ -184,11 +184,8 @@ const EditSiswa = ({navigation, route}) => {
 
     const onSelectBottomSheet = (select) => {
         setSelected(select);
-        console.log("select : ", select);
         refRBSheet.current.open();
     }
-
-    console.log("preview : ", previewImage);
     
     return (
         <View style={tw`h-full bg-white`}>

@@ -5,6 +5,7 @@ import materiReducer from "./reducers/materi-reducers";
 import settingReducer from "./reducers/setting-reducers";
 import classReducer from "./reducers/class-reducers";
 import mapelReducer from "./reducers/mapel-reducers";
+import examReducer from "./reducers/exam-reducers";
 
 const rootReducer = combineReducers(
     {
@@ -13,6 +14,7 @@ const rootReducer = combineReducers(
         materiReducer,
         classReducer,
         mapelReducer,
+        examReducer,
     }
 );
 

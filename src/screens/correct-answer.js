@@ -1,0 +1,277 @@
+import React, { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, Alert, Image, PermissionsAndroid, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import { useDispatch, useSelector } from 'react-redux';
+import tw from 'twrnc';
+import { correctStudentAnswer, detailAnswer, detailScore } from '../redux/actions/exam-actions';
+import DocumentPicker from "react-native-document-picker";
+import { isImage } from '../utils/function';
+import { customStyle } from '../utils/style';
+import { baseUrl } from '../utils/global';
+import ImageView from "react-native-image-viewing";
+import RNFetchBlob from 'rn-fetch-blob';
+
+const CorrectAnswer = ({navigation, route}) => {
+    const {id_ujian, id_siswa} = route.params;
+
+    const dispatch = useDispatch();
+
+    
+    const [pgQuestion, setPgQuesetion] = useState([]);
+    const [essayQuestion, setEssayQuesetion] = useState([]);
+    const [questionType, setQuestionType] = useState(1);
+    const [question, setQuestion] = useState([]);
+    const [fileSoal, setFileSoal] = useState([]);
+    const [imagesPeview, setImagePreview] = useState([]);
+    const [previewVisible, setIsPreviewVisible] = useState(false);
+    const [indexQuestion, setIndexQuestion] = useState(1);
+    const [statusDownload, setStatusDownload] = useState(false);
+    
+    const {load_exam, correct_student_answer, detail_score, detail_answer} = useSelector((state) => state.examReducer);
+
+    const loadData = async() => {
+        await dispatch(correctStudentAnswer(id_ujian));
+        await dispatch(detailScore(id_ujian, id_siswa));
+    }
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    useEffect(() => {
+        if(Object.keys(correct_student_answer).length > 0){
+            setPgQuesetion(correct_student_answer.pg);
+            setEssayQuesetion(correct_student_answer.essay);
+            setQuestion(correct_student_answer.pg[0]);
+            setQuestionType(correct_student_answer.pg[0].id_jenis_soal);
+            dispatch(detailAnswer(id_ujian, id_siswa, correct_student_answer.pg[0].id));
+        }
+    }, [correct_student_answer]);
+
+    const renderQuestion = (index, type, question) => {
+        setIndexQuestion(index);
+        setQuestionType(type);
+        setQuestion(question);
+        dispatch(detailAnswer(id_ujian, id_siswa, question.id));
+        console.log("id soal : ", question.id);
+    }
+
+    const previewImage = (image) => {
+        let listImage = [];
+        listImage.push({uri: baseUrl + image});
+        setImagePreview(listImage);
+        setIsPreviewVisible(true);
+    }
+
+    const checkPermission = async (fileUrl) => {
+    
+        if (Platform.OS === 'ios') {
+            downloadFile(fileUrl);
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                {
+                    title: 'Storage Permission Required',
+                    message:
+                    'Application needs access to your storage to download File',
+                }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    setStatusDownload(true);
+                    downloadFile(fileUrl);
+                    console.log('Storage Permission Granted.');
+                } else {
+                    Alert.alert('Error','Storage Permission Not Granted');
+                }
+            } catch (err) {
+                console.log("++++"+err);
+            }
+        }
+    };
+    
+    const downloadFile = (fileUrl) => {
+        let date = new Date();
+        
+        let FILE_URL = fileUrl;    
+        
+        let file_ext = getFileExtention(FILE_URL);
+    
+        file_ext = '.' + file_ext[0];
+    
+        const { config, fs } = RNFetchBlob;
+        let RootDir = fs.dirs.PictureDir;
+        let options = {
+            fileCache: true,
+            addAndroidDownloads: {
+                path:
+                RootDir+
+                '/Download/file_' + 
+                Math.floor(date.getTime() + date.getSeconds() / 2) +
+                file_ext,
+                description: 'downloading file...',
+                notification: true,
+                
+                useDownloadManager: true,
+            },
+        };
+
+        config(options)
+        .fetch('GET', FILE_URL)
+        .then(res => {
+            Alert.alert('Download materi', 'Download Berhasil.');
+            setStatusDownload(false);
+        });
+    };
+    
+    const getFileExtention = (fileUrl) => {
+        return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+    };
+    
+
+    return load_exam ? (
+        <View style={tw`flex flex-1 justify-center items-center`}>
+            <ActivityIndicator size="large" color="#ff1402" />
+            <Text style='text-center'>Loading....</Text>
+        </View>
+      ) : (
+        <View style={tw`h-full bg-white`}>
+            <View style={tw`flex flex-row justify-between items-center p-2`}>
+                <Pressable style={tw`py-2 px-4 rounded-full shadow bg-white`} onPress={() => navigation.goBack()}>
+                    <Icon name={'angle-left'} size={25} color="#000000" />
+                </Pressable>
+                <Text style={tw`text-center text-lg mr-5`}>Koreksi Jawaban</Text>
+                <View></View>
+            </View>
+            <ScrollView>
+                <View style={tw`px-4`}>
+                    <Text style={tw`mt-4 text-lg`}>{correct_student_answer.name}</Text>
+                    <Text style={tw`my-2 text-lg`}>Nilai : {detail_score.nilai}</Text>
+
+                    <Text style={tw`mt-3`}>Soal Pilihan Ganda</Text>
+                    <View style={tw`flex flex-row items-center my-3`}>
+                        {pgQuestion.map((pg, index) => {
+                            return (
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => renderQuestion(index + 1, pg.id_jenis_soal, pg)}
+                                >
+                                    <Text style={tw`bg-teal-500 text-white mr-2 p-3 rounded`}>{index + 1}</Text>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </View>
+
+                    <Text style={tw`mt-3`}>Soal Essay</Text>
+                    <View style={tw`flex flex-row items-center my-3`}>
+                        {essayQuestion.map((essay, index) => {
+                            return (
+                                <TouchableOpacity 
+                                    key={index}
+                                    onPress={() => renderQuestion(index + 1, essay.id_jenis_soal, essay)}
+                                >
+                                    <Text style={tw`bg-teal-500 text-white mr-2 p-3 rounded`}>{index + 1}</Text>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </View>
+
+                    <View>
+                        <Text>{indexQuestion}. {question.pertanyaan}</Text>
+                        {questionType == 1 &&
+                            <View>
+                                <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
+                                    <Text>a. {question.pilihan_a}</Text>
+                                    {detail_answer.jawaban_siswa == 'a' && <Icon name={'check'} size={20} color="#000000" />}
+                                </View>
+                                <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
+                                    <Text>b. {question.pilihan_b}</Text>
+                                    {detail_answer.jawaban_siswa == 'b' && <Icon name={'check'} size={20} color="#000000" />}
+                                </View>
+                                <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
+                                    <Text>c. {question.pilihan_c}</Text>
+                                    {detail_answer.jawaban_siswa == 'c' && <Icon name={'check'} size={20} color="#000000" />}
+                                </View>
+                                <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
+                                    <Text>d. {question.pilihan_d}</Text>
+                                    {detail_answer.jawaban_siswa == 'd' && <Icon name={'check'} size={20} color="#000000" />}
+                                </View>
+                            </View>
+                        }
+                        <ImageView
+                            images={imagesPeview}
+                            imageIndex={0}
+                            visible={previewVisible}
+                            onRequestClose={() => setIsPreviewVisible(false)}
+                        />
+                        {question.detail && 
+                            <ScrollView horizontal={true} style={tw` my-3`}>
+                                <View style={tw`flex flex-row justify-start mb-2 w-full h-20`}>
+                                    {question.detail.map((detail, index) => {
+                                        return (
+                                            isImage(detail.name) ? (
+                                                <TouchableOpacity onPress={() => previewImage(detail.name)} style={tw`px-2`} key={index}>
+                                                    <Image
+                                                        style={[customStyle.aspectSquare, tw`rounded w-1/3`]}
+                                                        source={{
+                                                            uri: baseUrl + detail.name,
+                                                        }}
+                                                    />
+                                                </TouchableOpacity>
+                                            ) : (
+                                                !statusDownload ? (
+                                                    <TouchableOpacity onPress={() => checkPermission(baseUrl + detail.name)} style={tw`px-2`} key={index}>
+                                                        <Image
+                                                            style={[customStyle.aspectSquare, tw`rounded w-1/3`]}
+                                                            source={require('../assets/images/file.jpg')}
+                                                        />
+                                                    </TouchableOpacity>
+                                                ) : (
+                                                    <View style={tw`w-20 px-2 bg-gray-200 rounded pt-7`} key={index}>
+                                                        <ActivityIndicator size="small" color="#03a9f4" />
+                                                    </View>
+                                                )
+                                            )
+                                        )
+                                    })}
+                                </View>
+                            </ScrollView>
+                        }
+
+                        <Text>Jawaban Siswa : </Text>
+                        {questionType == 1 ? (
+                            <Text>{detail_answer.jawaban_siswa == 'a' ? (
+                                'a. ' + question.pilihan_a
+                            ) : detail_answer.jawaban_siswa == 'b' ? (
+                                'b. ' + question.pilihan_b
+                            ) : detail_answer.jawaban_siswa == 'c' ? (
+                                'c. ' + question.pilihan_c
+                            ) : detail_answer.jawaban_siswa == 'd' ? (
+                                'd. ' + question.pilihan_d
+                            ) : null}</Text>
+                        ) : (
+                            <Text>{detail_answer.jawaban_siswa}</Text>
+                        )}
+                         
+                        <Text style={tw`mt-3`}>Koreksi Jawaban : </Text>
+                        {questionType == 1 ? (
+                            <Text>{question.jawaban == 'a' ? (
+                                'a. ' + question.pilihan_a
+                            ) : question.jawaban == 'b' ? (
+                                'b. ' + question.pilihan_b
+                            ) : question.jawaban == 'c' ? (
+                                'c. ' + question.pilihan_c
+                            ) : question.jawaban == 'd' ? (
+                                'd. ' + question.pilihan_d
+                            ) : null}</Text>
+                        ) : (
+                            null
+                        )}
+                    </View>
+                </View>
+            </ScrollView>
+        </View>
+    )
+}
+
+export default CorrectAnswer

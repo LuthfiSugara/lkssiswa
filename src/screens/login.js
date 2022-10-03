@@ -1,117 +1,101 @@
-import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity, Pressable, Image } from 'react-native'
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { isLoggedIn, signIn } from "../redux/actions/auth-actions"
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StatusBar } from 'react-native'
+import React from 'react'
+import { useDispatch } from 'react-redux'
+import { signIn } from "../redux/actions/auth-actions"
 import tw from 'twrnc';
-import { Formik } from 'formik';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import { useFormik } from 'formik';
 import * as Yup from "yup";
 import DeviceInfo from 'react-native-device-info';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import { baseUrl } from '../utils/global';
+import { customStyle } from '../utils/style';
+import { useState } from 'react';
+import Statusbar from '../components/status-bar';
 
 
-const Login = ({navigation}) => {
+const Login = () => {
 
     const dispatch = useDispatch();
+    const [showPassword, setShowPassword] = useState(true);
 
-    const {loading, token, sign_out, is_logged_in} = useSelector(state => state.userReducer);
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
-
-    const userLogin = async() => {
-        console.log("login");
-        let token = "123123";
-        await dispatch(signIn(token));
+    const changeIconPassword = () => {
+        showPassword === false ? setShowPassword(true) : setShowPassword(false);
     }
 
+    const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
+        initialValues: {
+            username: '',
+            password: '',
+            device_name: DeviceInfo.getBrand(),
+        },
+        onSubmit: values => {
+            dispatch(signIn(values));
+        },
+        validationSchema: Yup.object().shape({
+            username: Yup
+                .string()
+                .required("Tidak boleh kosong!"),
+            password: Yup
+                .string()
+                .min(6, "Minimal 6 karakter")
+                .required("Tidak boleh kosong!"),
+        }),
+    });
+
     return (
-        <View style={tw`bg-white flex-1 justify-center px-4`}>
-            <View style={tw`self-center mb-10`}>
-                <Image
-                    source={require('../assets/images/logo.png')}
-                    style={tw`w-20 h-20`}
-                />
-            </View>
-            <Formik
-                initialValues={{ 
-                    username: '',
-                    password: '',
-                    device_name: DeviceInfo.getBrand()
-                }}
-                onSubmit={(values) => {
-                    dispatch(signIn(values));
-                }}
-                validationSchema={Yup.object().shape({
-                    username: Yup
-                        .string()
-                        .required("Tidak boleh kosong!"),
-                    password: Yup
-                        .string()
-                        .min(6, "Minimal 6 karakter")
-                        .required("Tidak boleh kosong"),
-                })}
-            >
-                {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
-                <View>
-                    <View style={tw`mb-4`}>
-                        <Text>Username</Text>
-                        <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                            <Icon name={'user'} size={20} color="#0096FF" style={tw`px-4`} />
+        <View style={tw`bg-teal-600 justify-center`}>
+            <Statusbar page="login" />
+            <ScrollView style={tw``}>
+                <View style={tw`bg-teal-600`}>
+                    <Text style={tw`text-white text-center text-4xl font-bold mt-10 mb-5`}>Log-In</Text>
+                </View>
+                <View style={[tw`bg-white rounded-t-3xl px-4`, customStyle.shadow]}>
+                    <View style={tw`my-10 w-full`}>
+                        <Image
+                            source={require('../assets/images/logo.png')}
+                            style={[tw`w-30 h-30 mx-auto`, customStyle.aspectSquare]}
+                        />
+                    </View>
+                    <View style={tw`h-full`}>
+                        <View style={tw`mb-4`}>
+                            <Text style={tw`text-black mb-1`}>Username</Text>
                             <TextInput
                                 value={values.username}
-                                onChangeText={handleChange('username')}
-                                onBlur={() => setFieldTouched('username')}
-                                placeholder="Username"
-                                style={tw`w-full border-l border-gray-300 pl-2`}
+                                onChangeText={(e) => setFieldValue('username', e)}
+                                placeholder="user"
+                                style={[tw`w-full border border-gray-300 rounded-lg px-2`]}
                             />
+                            {touched.username && errors.username &&
+                                <Text style={tw`text-xs text-red-600`}>{errors.username}</Text>
+                            }
                         </View>
-                        {touched.username && errors.username &&
-                            <Text style={tw`text-xs text-red-600`}>{errors.username}</Text>
-                        }
-                    </View>    
-                    
-                    <View style={tw`mb-4`}>
-                        <Text>password</Text>
-                        <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                            <Icon name={'lock'} size={20} color="#0096FF" style={tw`px-4`} />
-                            <TextInput
-                                value={values.password}
-                                onChangeText={handleChange('password')}
-                                onBlur={() => setFieldTouched('password')}
-                                placeholder="password"
-                                secureTextEntry
-                                style={tw`w-full border-l border-gray-300 pl-2`}
-                            />
+                        
+                        <View style={tw`mb-4`}>
+                            <Text style={tw`text-black mb-1`}>Password</Text>
+                            <View style={tw`flex flex-row justify-between items-center border border-gray-300 rounded-lg`}>
+                                <TextInput
+                                    value={values.password}
+                                    onChangeText={(e) => setFieldValue('password', e)}
+                                    placeholder="******"
+                                    secureTextEntry={showPassword}
+                                    style={[tw`px-2`, customStyle.w85]}
+                                />
+                                <Icon name={showPassword ? "eye-slash" : "eye"} size={15} color="#9e9e9e" style={[tw`px-4 py-3`, customStyle.w15]} onPress={changeIconPassword} />
+                            </View>
+                            {touched.password && errors.password &&
+                                <Text style={tw`text-xs text-red-600`}>{errors.password}</Text>
+                            }
                         </View>
-                        {touched.password && errors.password &&
-                            <Text style={tw`text-xs text-red-600`}>{errors.password}</Text>
-                        }
+                        <TouchableOpacity 
+                            style={tw`bg-teal-600 p-2 mt-10 rounded-md`}
+                            onPress={handleSubmit}
+                        >
+                            <Text style={tw`text-white font-semibold text-center text-lg`}>Login</Text>
+                        </TouchableOpacity>
                     </View>
-                    
-                    <Pressable 
-                        style={tw`bg-blue-500 p-2 rounded-md`}
-                        onPress={handleSubmit}
-                    >
-                        <Text style={tw`text-white font-semibold text-center text-lg`}>Login</Text>
-                    </Pressable>
                 </View>
-                )}
-            </Formik>
-            
+            </ScrollView>
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    btn: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 4,
-        elevation: 3,
-        backgroundColor: 'black',
-    }
-})
 
 export default Login

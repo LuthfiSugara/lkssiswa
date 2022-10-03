@@ -1,18 +1,23 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ScrollView, StatusBar, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getProfile, signOut } from '../redux/actions/auth-actions';
+import { getAllUser, getProfile, signOut } from '../redux/actions/auth-actions';
 import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Statusbar from '../components/status-bar';
+import { UseGetAction } from '../utils/use-get-action';
+import ProfileUser from './profile-user';
+import * as action from "../redux/actions/auth-actions";
+import { getToken } from '../utils/config/api';
 
 
 const Home = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  const {loading, profile} = useSelector((state) => state.userReducer);
+  const {load_auth, profile} = useSelector((state) => state.userReducer);
 
   const loadData = async() => {
       await dispatch(getProfile());
@@ -22,7 +27,6 @@ const Home = ({navigation}) => {
   useEffect(() => {
     loadData();
   }, []);
-    
 
   const data = [
     { label: 'Profile', value: profile?.nama_lengkap },
@@ -36,8 +40,14 @@ const Home = ({navigation}) => {
     });
   }
       
-  return (
+  return load_auth ? (
+    <View style={tw`flex flex-1 justify-center items-center`}>
+        <ActivityIndicator size="large" color="#ff1402" />
+        <Text style='text-center'>Loading....</Text>
+    </View>
+  ) : ( 
     <View>
+      <Statusbar page="home" />
       <View style={tw`p-4`}>
         <Dropdown
           style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
