@@ -1,16 +1,13 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, StatusBar, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Pressable, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAllUser, getProfile, signOut } from '../redux/actions/auth-actions';
+import { getProfile, signOut } from '../redux/actions/auth-actions';
 import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Dropdown } from 'react-native-element-dropdown';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Statusbar from '../components/status-bar';
-import { UseGetAction } from '../utils/use-get-action';
-import ProfileUser from './profile-user';
-import * as action from "../redux/actions/auth-actions";
-import { getToken } from '../utils/config/api';
+import { baseUrl } from '../utils/global';
+import { customStyle } from '../utils/style';
+import Loader from '../components/loader';
 
 
 const Home = ({navigation}) => {
@@ -22,16 +19,10 @@ const Home = ({navigation}) => {
   const loadData = async() => {
       await dispatch(getProfile());
   }
-  const [isFocus, setIsFocus] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
-
-  const data = [
-    { label: 'Profile', value: profile?.nama_lengkap },
-    { label: 'Logout', value: profile?.nama_lengkap },
-  ];
 
   const redirectToDetail = (id, idJabatan) => {
     navigation.navigate('ProfileUser', {
@@ -41,72 +32,110 @@ const Home = ({navigation}) => {
   }
       
   return load_auth ? (
-    <View style={tw`flex flex-1 justify-center items-center`}>
-        <ActivityIndicator size="large" color="#ff1402" />
-        <Text style='text-center'>Loading....</Text>
-    </View>
+    <Loader/>
   ) : ( 
-    <View>
-      <Statusbar page="home" />
-      <View style={tw`p-4`}>
-        <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
-          data={data}
-          search={false}
-          maxHeight={300}
-          labelField="label"
-          valueField={profile?.nama_lengkap}
-          placeholder={!isFocus ? profile?.nama_lengkap : '...'}
-          value={profile?.nama_lengkap}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
-            setIsFocus(false);
-            if(item.label == "Logout"){
-              dispatch(signOut());
-            }else if(item.label == "Profile"){
-              redirectToDetail(profile?.id, profile.id_jabatan);
-            }
-          }}
-        />
-      </View>
-      <ScrollView style={tw`h-full p-4 bg-white`}>
-        <View style={tw`flex flex-row flex-wrap justify-center`}>
-          <Pressable
-            onPress={() => navigation.navigate('User')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
-            <Icon name={'users'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Data User</Text>
-          </Pressable>
-          <Pressable 
+    <View style={tw`bg-white pb-8`}>
+      <ScrollView style={tw`h-full bg-white`}>
+        <Statusbar page="home" />
+        <View style={tw`border border-gray-500 rounded-lg mx-4 my-6`}>
+          <View style={tw`flex flex-row rounded-t-lg bg-teal-50 p-4 items-center border-b border-gray-500`}>
+            <View style={[tw`flex flex-col`, customStyle.w70]}>
+              <Text style={tw`text-lg font-bold`}>Selamat Datang</Text>
+              <View style={tw`flex flex-row`}>
+                <Text style={tw`bg-teal-500 py-1 px-4 rounded-lg text-white`}>{profile.nama}</Text>
+              </View>
+            </View>
+            <View style={[tw`ml-1`, customStyle.w15]}>
+              <Image
+                style={tw`w-20 h-20 rounded-lg`}
+                source={{uri: baseUrl + profile.foto}}
+              />
+            </View>
+          </View>
+
+          <View style={tw`px-4 py-2 flex flex-row justify-around`}>
+            <TouchableOpacity onPress={() => {
+              redirectToDetail(profile.id, profile.jabatan.id);
+            }}>
+              <Icon name={'user'} size={20} color="#000000" style={tw`text-center`} />
+              <Text style={tw`text-center`}>Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              Alert.alert(
+                "",
+                "Yakin, ingin keluar ?",
+                [
+                    { text: "Tidak" },
+                    { text: "Ya", onPress: () => {
+                      dispatch(signOut());
+                    }}
+                ]
+              );
+            }}>
+              <Icon name={'power-off'} size={20} color="#000000" style={tw`text-center`} />
+              <Text style={tw`text-center`}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      
+        <View style={tw`flex flex-row flex-wrap justify-around mx-4`}>
+          {profile.id_jabatan == 1 && 
+            <TouchableOpacity
+              onPress={() => navigation.navigate('User')}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+            >
+              <Image
+                style={[tw`rounded-lg w-20 h-20 m-4`, customStyle.aspectSquare]}
+                source={require('../assets/images/user.jpg')}
+              />
+              <Text style={tw`font-semibold text-black text-center my-2`}>Data Pengguna</Text>
+            </TouchableOpacity>  
+          }
+          
+          <TouchableOpacity 
             onPress={() => navigation.navigate('Materi')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+            style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
           >
-            <Icon name={'book'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Materi</Text>
-          </Pressable>
-          <Pressable 
+            <Image
+              style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
+              source={require('../assets/images/materi.jpg')}
+            />
+
+            <Text style={tw`font-semibold text-black text-center my-2`}>Materi Pembelajaran</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
             onPress={() => navigation.navigate('LKS')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+            style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
           >
-            <Icon name={'file-signature'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>E-LKS</Text>
-          </Pressable>
-          <Pressable 
-            onPress={() => navigation.navigate('Setting')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-          >
-            <Icon name={'cog'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Pengaturan</Text>
-          </Pressable>
-          <Pressable 
+            <Image
+              style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
+              source={require('../assets/images/e-lks.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>E-LKS</Text>
+          </TouchableOpacity>
+          {profile.id_jabatan == 1 && 
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Setting')}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+            >
+              <Image
+                style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
+                source={require('../assets/images/setting.jpg')}
+              />
+              <Text style={tw`font-semibold text-black text-center my-2`}>Pengaturan</Text>
+            </TouchableOpacity>
+          }
+
+          <TouchableOpacity 
             onPress={() => navigation.navigate('Nilai')}
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+            style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
           >
-            <Icon name={'folder'} size={30} color="#0096FF" />
-            <Text style={tw`text-lg font-semibold text-black`}>Nilai</Text>
-          </Pressable>
+            <Image
+              style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
+              source={require('../assets/images/score.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>Nilai</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

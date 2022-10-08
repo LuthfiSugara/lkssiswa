@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import tw from "twrnc";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useFormik } from "formik";
@@ -14,6 +14,8 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import {Picker} from '@react-native-picker/picker';
 import { useIsFocused } from "@react-navigation/native";
 import { customStyle } from "../utils/style";
+import Loader from "../components/loader";
+import { baseUrl } from "../utils/global";
 
 const options = {
     title: "Select Image",
@@ -27,11 +29,6 @@ const options = {
     }
 }
 
-const listJK = [
-    { label: 'Laki-laki', value: '1' },
-    { label: 'Perempuan', value: '2' },
-];
-
 const EditGuru = ({navigation, route}) => {
     const dispatch = useDispatch();
     const {idJabatan, userId} = route.params;
@@ -41,6 +38,7 @@ const EditGuru = ({navigation, route}) => {
     const [showPassword, setShowPassword] = useState(true);
     const [foto, setFoto] = useState(null);
     const [select, setSelected] = useState("");
+    const [previewImage, setPreviewImage] = useState(null);
 
     const loadData = async () => {
         await dispatch(dataJK());
@@ -54,18 +52,31 @@ const EditGuru = ({navigation, route}) => {
         loadData();
     }, [isFocused]);
     
-    const {loading, data_jk, data_mapel, data_kelas, class_by_teacher_id} = useSelector((state) => state.settingReducer);
-    const {detail_user} = useSelector((state) => state.userReducer);
+    const {load_setting, data_jk, data_mapel, data_kelas, class_by_teacher_id} = useSelector((state) => state.settingReducer);
+    const {load_auth, detail_user} = useSelector((state) => state.userReducer);
 
-    const [date, setDate] = useState(new Date(format(new Date(detail_user?.tanggal_lahir), 'yyyy'), format(new Date(detail_user?.tanggal_lahir), 'M') - 1, format(new Date(detail_user?.tanggal_lahir), 'd')));
-    const [selectMapelName, setSelectMapelName] = useState(detail_user?.mapel?.name);
-    const [arrKelas, setArrKelas] = useState(class_by_teacher_id.kelas);
-    const [selectArrKelasName, setSelectArrKelasName] = useState(class_by_teacher_id.name);
+    const [date, setDate] = useState(new Date());
+    const [selectMapelName, setSelectMapelName] = useState("");
+    const [arrKelas, setArrKelas] = useState([]);
+    const [selectArrKelasName, setSelectArrKelasName] = useState([]);
 
     useEffect(() => {
-        setArrKelas(class_by_teacher_id.kelas);
-        setSelectArrKelasName(class_by_teacher_id.name);
+        if(Object.keys(class_by_teacher_id).length > 0){
+            if(class_by_teacher_id.kelas.length > 0 && class_by_teacher_id.name.length > 0){
+                setArrKelas(class_by_teacher_id.kelas);
+                setSelectArrKelasName(class_by_teacher_id.name);
+            }
+        }
     }, [class_by_teacher_id]);
+
+    useEffect(() => {
+        if(Object.keys(detail_user).length > 0){
+            setDate(new Date(format(new Date(detail_user?.tanggal_lahir), 'yyyy'), format(new Date(detail_user?.tanggal_lahir), 'M') - 1, format(new Date(detail_user?.tanggal_lahir), 'd')));
+            setSelectMapelName(detail_user.mapel.name);
+            setFieldValue('pendidikan_terakhir', detail_user.pendidikan.pendidikan_terakhir);
+            setPreviewImage(baseUrl + detail_user.foto);
+        }
+    }, [detail_user]);
         
     const changeIconPassword = () => {
         showPassword === false ? setShowPassword(true) : setShowPassword(false);
@@ -81,7 +92,7 @@ const EditGuru = ({navigation, route}) => {
             alamat: detail_user.alamat,
             no_hp: detail_user.no_hp,
             id_jenis_kelamin: detail_user.id_jenis_kelamin,
-            pendidikan_terakhir: detail_user.pendidikan.pendidikan_terakhir,
+            pendidikan_terakhir: '',
             id_kelas: arrKelas,
             id_mapel: detail_user.id_mapel,
         },
@@ -176,7 +187,7 @@ const EditGuru = ({navigation, route}) => {
         const images = await launchImageLibrary(options);
         if(!images.didCancel){
             setFoto(images);
-            console.log("images : ",images);
+            setPreviewImage(images.assets[0].uri);
         }
     }
 
@@ -205,7 +216,9 @@ const EditGuru = ({navigation, route}) => {
         }
     }
     
-    return (
+    return load_auth && load_setting ? (
+        <Loader/>
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
@@ -219,7 +232,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Nama Lengkap</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'user-circle'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.nama}
                             onChangeText={(event) => setFieldValue('nama', event)}
@@ -234,7 +246,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Username</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'user-cog'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.username}
                             onChangeText={(event) => setFieldValue('username', event)}s
@@ -249,9 +260,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Password</Text>
                     <View style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}>
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'user'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
                         <TextInput
                             value={values.password}
                             onChangeText={(event) => setFieldValue('password', event)}
@@ -270,7 +278,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Tempat Lahir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-book'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.tempat_lahir}
                             onChangeText={(event) => setFieldValue('tempat_lahir', event)}
@@ -288,7 +295,6 @@ const EditGuru = ({navigation, route}) => {
                         onPress={showDatepicker}
                         style={tw`flex flex-row border border-gray-300 rounded-md items-center`}
                     >
-                        <Icon name={'calendar-check'} size={20} color="#0096FF" style={tw`px-4`} />
                         <Text style={tw`border-l border-gray-300 p-4`}>{values.tanggal_lahir ? format(new Date(date), 'dd/MM/yyyy') : ""}</Text>
                     </Pressable>
                     {touched.tanggal_lahir && errors.tanggal_lahir &&
@@ -299,7 +305,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Nomor Handphone</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'phone'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.no_hp}
                             onChangeText={(event) => setFieldValue('no_hp', event)}
@@ -314,7 +319,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Alamat</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.alamat}
                             onChangeText={(event) => setFieldValue('alamat', event)}
@@ -348,7 +352,6 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Pendidikan Terakhir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.pendidikan_terakhir}
                             onChangeText={(event) => setFieldValue('pendidikan_terakhir', event)}
@@ -366,9 +369,6 @@ const EditGuru = ({navigation, route}) => {
                         style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}
                         onPress={() => onSelectBottomSheet("kelas")} 
                     >
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'university'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
                         <Text
                             style={tw`w-4/5 px-2`}
                         >{selectArrKelasName && selectArrKelasName.length > 2 ? selectArrKelasName.toString() + '...' : selectArrKelasName}</Text>
@@ -389,9 +389,6 @@ const EditGuru = ({navigation, route}) => {
                         style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}
                         onPress={() => onSelectBottomSheet("mapel")} 
                     >
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'book-open'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
                         <Text style={tw`w-4/5 px-2`}>{selectMapelName}</Text>
                         <View style={[styles.w10, tw`h-full`]}>
                             <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
@@ -405,10 +402,16 @@ const EditGuru = ({navigation, route}) => {
                 <View style={tw`flex flex-row justify-center mt-4 mb-12`}>
                     <TouchableOpacity
                         onPress={openGallery}
-                        style={[styles.shadowUpload, tw`w-1/3 rounded-full p-4`]}
+                        style={tw`rounded-full p-4`}
                     >
-                        <Icon name={'cloud-upload-alt'} size={50} color="#0096FF" style={tw`px-3 text-center`} />
-                        <Text style={tw`text-center`}>Upload Foto</Text>
+                        <View style={tw`w-full flex flex-row justify-center`}>
+                            <Image
+                                style={[tw`w-3/4 h-32 rounded-lg`, customStyle.aspectSquare]}
+                                source={{
+                                    uri: previewImage,
+                                }}
+                            />
+                        </View>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -456,7 +459,6 @@ const EditGuru = ({navigation, route}) => {
                                         onPress={() => {
                                             setFieldValue('id_mapel', mapel.id);
                                             setSelectMapelName(mapel.name);
-                                            // refRBSheet.current.close();
                                         }}
                                         style={tw`${mapel.id === values.id_mapel ? "border-blue-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
                                         key={index}
@@ -474,7 +476,7 @@ const EditGuru = ({navigation, route}) => {
 
             {isValid && arrKelas && arrKelas.length > 0 ? (
                 <TouchableOpacity 
-                    style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
+                    style={ tw`bg-teal-500 p-2 rounded-md mb-4 mx-4`}
                     onPress={handleSubmit}
                 >
                     <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>

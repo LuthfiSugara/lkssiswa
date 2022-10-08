@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import tw from "twrnc";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useFormik } from "formik";
@@ -12,6 +12,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import {launchImageLibrary} from 'react-native-image-picker';
 import { editProfileUser, getDetailUser } from "../redux/actions/auth-actions";
 import {Picker} from '@react-native-picker/picker';
+import Loader from "../components/loader";
+import { customStyle } from "../utils/style";
+import { baseUrl } from "../utils/global";
 
 const options = {
     title: "Select Image",
@@ -25,17 +28,12 @@ const options = {
     }
 }
 
-const listJK = [
-    { label: 'Laki-laki', value: '1' },
-    { label: 'Perempuan', value: '2' },
-];
-
 const EditAdmin = ({navigation, route}) => {
     const dispatch = useDispatch();
     const {userId, idJabatan} = route.params;
 
-    const {loading, data_jk} = useSelector((state) => state.settingReducer);
-    const {detail_user} = useSelector((state) => state.userReducer);
+    const {load_setting, data_jk} = useSelector((state) => state.settingReducer);
+    const {load_auth, detail_user} = useSelector((state) => state.userReducer);
 
     const loadData = async() => {
         await dispatch(dataJK());
@@ -47,10 +45,18 @@ const EditAdmin = ({navigation, route}) => {
     }, []);
 
     const [showPassword, setShowPassword] = useState(true);
-    const [date, setDate] = useState(new Date(format(new Date(detail_user.tanggal_lahir), 'yyyy'), format(new Date(detail_user.tanggal_lahir), 'M') - 1, format(new Date(detail_user.tanggal_lahir), 'd')));
+    const [date, setDate] = useState(new Date());
     const [isFocus, setIsFocus] = useState(false);
     const [gender, setGender] = useState("");
     const [foto, setFoto] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
+
+    useEffect(() => {
+        if(Object.keys(detail_user).length > 0){
+            setDate(new Date(format(new Date(detail_user.tanggal_lahir), 'yyyy'), format(new Date(detail_user.tanggal_lahir), 'M') - 1, format(new Date(detail_user.tanggal_lahir), 'd')));
+            setPreviewImage(baseUrl + detail_user.foto);
+        }
+    }, [detail_user]);
 
     const changeIconPassword = () => {
         showPassword === false ? setShowPassword(true) : setShowPassword(false);
@@ -88,10 +94,9 @@ const EditAdmin = ({navigation, route}) => {
                     name: foto.assets[0].fileName,
                 });
             }
-            // console.log("form",formData);
+            
             dispatch(editProfileUser(userId, formData))
             .then(response => {
-                // console.log("res : ", response);
                 if(response.status === "success"){
                     navigation.goBack();
                 }
@@ -149,11 +154,14 @@ const EditAdmin = ({navigation, route}) => {
         const images = await launchImageLibrary(options);
         if(!images.didCancel){
             setFoto(images);
+            setPreviewImage(images.assets[0].uri);
         }
         
     }
     
-    return (
+    return load_auth && load_setting ? (
+        <Loader/>
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
@@ -167,7 +175,6 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Nama Lengkap</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'user-circle'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.nama}
                             onChangeText={(event) => setFieldValue('nama', event)}
@@ -182,7 +189,6 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Username</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'user-cog'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.username}
                             onChangeText={(event) => setFieldValue('username', event)}s
@@ -197,18 +203,14 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Password</Text>
                     <View style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}>
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'lock'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
                         <TextInput
                             value={values.password}
                             onChangeText={(event) => setFieldValue('password', event)}
                             secureTextEntry={showPassword}
                             style={tw`w-4/5 px-2`}
                         />
-                        <View style={[styles.w10, tw`border-l border-gray-300 h-full`]}>
-                            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#0096FF" style={tw`p-2 py-4`} onPress={changeIconPassword} />
-                        </View>
+                        
+                        <Icon name={showPassword ? "eye-slash" : "eye"} size={15} color="#090909" style={tw`p-4`} onPress={changeIconPassword} />
                     </View>
                     {touched.password && errors.password &&
                         <Text style={tw`text-xs text-red-600`}>{errors.password}</Text>
@@ -218,7 +220,6 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Tempat Lahir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-book'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.tempat_lahir}
                             onChangeText={(event) => setFieldValue('tempat_lahir', event)}s
@@ -236,7 +237,6 @@ const EditAdmin = ({navigation, route}) => {
                         onPress={showDatepicker}
                         style={tw`flex flex-row border border-gray-300 rounded-md items-center`}
                     >
-                        <Icon name={'calendar-check'} size={20} color="#0096FF" style={tw`px-4`} />
                         <Text style={tw`border-l border-gray-300 p-4`}>{values.tanggal_lahir ? format(new Date(date), 'dd/MM/yyyy') : ""}</Text>
                     </Pressable>
                     {touched.tanggal_lahir && errors.tanggal_lahir &&
@@ -247,7 +247,6 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Nomor Handphone</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'phone'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.no_hp}
                             onChangeText={(event) => setFieldValue('no_hp', event)}
@@ -262,7 +261,6 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Alamat</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.alamat}
                             onChangeText={(event) => setFieldValue('alamat', event)}
@@ -295,19 +293,23 @@ const EditAdmin = ({navigation, route}) => {
                 <View style={tw`flex flex-row justify-center mt-4 mb-12`}>
                     <TouchableOpacity
                         onPress={openGallery}
-                        style={[styles.shadowUpload, tw`w-1/3 rounded-full p-4`]}
+                        style={tw`rounded-full p-4`}
                     >
-                        <Icon name={'cloud-upload-alt'} size={50} color="#0096FF" style={tw`px-3 text-center`} />
-                        <Text style={tw`text-center`}>Upload Foto</Text>
+                        <Image
+                            style={[tw`w-3/4 h-32 rounded-lg`, customStyle.aspectSquare]}
+                            source={{
+                                uri: previewImage,
+                            }}
+                        />
                     </TouchableOpacity>
                 </View>
             </ScrollView>
 
             <TouchableOpacity 
-                style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
+                style={ tw`bg-teal-500 p-2 rounded-md mb-4 mx-4`}
                 onPress={handleSubmit}
             >
-                <Text style={tw`text-white font-semibold text-center text-lg`}>Tambah Admin</Text>
+                <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>
             </TouchableOpacity>
         </View>
     )

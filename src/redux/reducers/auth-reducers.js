@@ -58,8 +58,8 @@ const userReducer = (state = initialState, action) => {
         case GET_PROFILE:
             return {
                 ...state,
-                load_auth: false,
-                profile: action.payload
+                load_auth: action.payload.loading,
+                profile: action.payload.data
             }
         case GET_ALL_USER:
             return {
@@ -88,8 +88,8 @@ const userReducer = (state = initialState, action) => {
         case GET_DETAIL_USER:
             return {
                 ...state,
-                load_auth: false,
-                detail_user: action.payload
+                load_auth: action.payload.loading,
+                detail_user: action.payload.data,
             }
         case GETTEACHERBYID:
             return {

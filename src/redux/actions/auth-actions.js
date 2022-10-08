@@ -195,38 +195,12 @@ export const getProfile = () =>
         undefined,
     );
 
-export const getDetailUser = (id) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/detail-user/${id}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GET_DETAIL_USER,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getDetailUser = (id) => 
+    UseGetAction(
+        'detail-user',
+        GET_DETAIL_USER, 
+        {id: id},
+    );
 
 export const getAllUser = () => 
     UseGetAction(

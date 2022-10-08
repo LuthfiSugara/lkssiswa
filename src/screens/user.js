@@ -1,7 +1,8 @@
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { customStyle } from "../utils/style";
 
 const User = ({navigation}) => {
     return (
@@ -10,32 +11,49 @@ const User = ({navigation}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>User</Text>
+                <Text style={tw`text-center mr-5`}>Data Pengguna</Text>
                 <View></View>
             </View>
-            <ScrollView style={tw`h-full p-4 bg-white`}>
-                <View style={tw`flex flex-row flex-wrap justify-center`}>
-                    <Pressable
+            <ScrollView style={tw`h-full bg-white`}>
+                <View style={tw`flex flex-row items-center bg-teal-500 mx-4 rounded-lg mt-5`}>
+                    <Image
+                        style={[tw`rounded-lg w-40 h-40 m-4`, customStyle.aspectSquare, customStyle.w20]}
+                        source={require('../assets/images/teacher.jpg')}
+                    />
+                    <Text style={[tw`text-white`, customStyle.w80]}>Kelola data Guru, Murid dan Admin</Text>
+                </View>
+                <View style={tw`flex flex-row flex-wrap justify-around mx-2 mt-5`}>
+
+                    <TouchableOpacity
                         onPress={() => navigation.navigate('ListGuru')}
-                        style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+                        style={[customStyle.w45, tw` p-4 m-2 items-center border border-gray-500 rounded-xl`]}
                     >
-                        <Icon name={'user-clock'} size={30} color="#0096FF" />
+                        <Image
+                            style={[tw`rounded-lg w-30 h-30 m-4`, customStyle.aspectSquare]}
+                            source={require('../assets/images/teacher.jpg')}
+                        />
                         <Text style={tw`text-lg font-semibold text-black`}>Guru</Text>
-                    </Pressable>
-                    <Pressable
+                    </TouchableOpacity>
+                    <TouchableOpacity
                         onPress={() => navigation.navigate('ListSiswa')}
-                        style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+                        style={[customStyle.w45, tw` p-4 m-2 items-center border border-gray-500 rounded-xl`]}
                     >
-                        <Icon name={'user-graduate'} size={30} color="#0096FF" />
+                        <Image
+                            style={[tw`rounded-lg w-30 h-30 m-4`, customStyle.aspectSquare]}
+                            source={require('../assets/images/student.jpg')}
+                        />
                         <Text style={tw`text-lg font-semibold text-black`}>Murid</Text>
-                    </Pressable>
-                    <Pressable
+                    </TouchableOpacity>
+                    <TouchableOpacity
                         onPress={() => navigation.navigate('ListAdmin')}
-                        style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+                        style={[customStyle.w45, tw` p-4 m-2 items-center border border-gray-500 rounded-xl`]}
                     >
-                        <Icon name={'user-secret'} size={30} color="#0096FF" />
+                        <Image
+                            style={[tw`rounded-lg w-30 h-30 m-4`, customStyle.aspectSquare]}
+                            source={require('../assets/images/admin.jpg')}
+                        />
                         <Text style={tw`text-lg font-semibold text-black`}>Admin</Text>
-                    </Pressable>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </View>

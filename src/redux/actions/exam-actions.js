@@ -14,10 +14,13 @@ import {
     GET_STUDENT_SCORE_DETAIL,
     CORRECT_STUDENT_ANSWER,
     DETAIL_SCORE,
-    DETAIL_ANSWER
+    DETAIL_ANSWER,
+    UPDATE_STUDENT_SCORE,
+    UPDATE_DETAIL_ANSWER,
 } from "../types/exam";
 import { ToastAndroid } from "react-native";
 import { UseGetAction } from "../../utils/use-get-action";
+import { UsePostAction } from "../../utils/use-post-action";
 
 export const getStudentScore = (id_kelas, id_mapel) => 
     UseGetAction(
@@ -657,4 +660,62 @@ export const detailAnswer = (id_ujian, id_siswa, id_soal) =>
         'detail-answer',
         DETAIL_ANSWER, 
         {id_ujian: id_ujian, id_siswa: id_siswa, id_soal: id_soal},
+    );
+
+export const updateDetailAnswer = (request) => async (dispatch) => {
+    try{
+        let token = "";
+        await AsyncStorage.getItem('userData')
+        .then(value => {
+            if(value != null){
+                let data = JSON.parse(value);
+                token = data.access_token;
+            }
+        });
+
+        const req = axios.post(
+            `${baseUrl}/api/update-detail-answer`, 
+            request,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }
+        ).then(function(response){
+            if(response.data.status === "success"){
+                ToastAndroid.showWithGravityAndOffset(
+                    response.data.message,
+                    ToastAndroid.LONG,
+                    ToastAndroid.TOP,
+                    25,
+                    50
+                );
+            }else{
+                ToastAndroid.showWithGravityAndOffset(
+                    response.data.message,
+                    ToastAndroid.LONG,
+                    ToastAndroid.TOP,
+                    25,
+                    50
+                );
+            }
+            
+            return response.data;
+        }).catch(function(error){
+            console.log(error);
+        });
+
+        return req;
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export const updateStudentScore = (data) => 
+    UsePostAction(
+        'update-student-score',
+        UPDATE_STUDENT_SCORE, 
+        undefined,
+        data,
     );

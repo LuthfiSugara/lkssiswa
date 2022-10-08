@@ -12,40 +12,48 @@ import {
     GETCLASSBYTEACHERID
 } from "../types/setting";
 import { ToastAndroid } from "react-native";
+import { UseGetAction } from "../../utils/use-get-action";
 
-export const dataKelas = () => {
-    try{
-        return async dispatch => {
-            console.log(`${baseUrl}/api/kelas`);
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/kelas`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: DATAKELAS,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const dataKelas = () => 
+    UseGetAction(
+        'kelas',
+        DATAKELAS, 
+        undefined,
+    );
+
+// export const dataKelas = () => {
+//     try{
+//         return async dispatch => {
+//             console.log(`${baseUrl}/api/kelas`);
+//             await AsyncStorage.getItem('userData')
+//             .then(value => {
+//                 if(value != null){
+//                     let data = JSON.parse(value);
+//                     axios.get(
+//                         `${baseUrl}/api/kelas`, 
+//                         {
+//                             headers: {
+//                                 'Content-Type': 'application/json',
+//                                 'Authorization': 'Bearer ' + data.access_token
+//                             }
+//                         }
+//                     ).then(function(response){
+//                         if(response.data.status === "success"){
+//                             dispatch({
+//                                 type: DATAKELAS,
+//                                 payload: response.data.data,
+//                             });
+//                         }
+//                     }).catch(function(error){
+//                         console.log(error);
+//                     });
+//                 }
+//             })
+//         }
+//     }catch(error){
+//         console.log(error);
+//     }
+// }
 
 export const tambahKelas = (request) => async (dispatch) => {
     try{
@@ -150,72 +158,52 @@ export const editKelas = (request, id) => async (dispatch) => {
     }
 }
 
-export const getClassByTeacherId = (id) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/get-class-by-teacher-id/${id}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETCLASSBYTEACHERID,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getClassByTeacherId = (id) => 
+    UseGetAction(
+        'get-class-by-teacher-id',
+        GETCLASSBYTEACHERID, 
+        {id: id},
+    );
 
-export const dataJK = () => {
-    try{
-        return async dispatch => {
-            console.log(`${baseUrl}/api/jenis-kelamin`);
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/jenis-kelamin`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: DATAJK,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+// export const getClassByTeacherId = (id) => {
+//     try{
+//         return async dispatch => {
+//             await AsyncStorage.getItem('userData')
+//             .then(value => {
+//                 if(value != null){
+//                     let data = JSON.parse(value);
+//                     axios.get(
+//                         `${baseUrl}/api/get-class-by-teacher-id/${id}`, 
+//                         {
+//                             headers: {
+//                                 'Content-Type': 'application/json',
+//                                 'Authorization': 'Bearer ' + data.access_token
+//                             }
+//                         }
+//                     ).then(function(response){
+//                         if(response.data.status === "success"){
+//                             dispatch({
+//                                 type: GETCLASSBYTEACHERID,
+//                                 payload: response.data.data,
+//                             });
+//                         }
+//                     }).catch(function(error){
+//                         console.log(error);
+//                     });
+//                 }
+//             })
+//         }
+//     }catch(error){
+//         console.log(error);
+//     }
+// }
+
+export const dataJK = () => 
+    UseGetAction(
+        'jenis-kelamin',
+        DATAJK, 
+        undefined,
+    );
 
 export const dataJabatan = () => {
     try{
@@ -251,39 +239,46 @@ export const dataJabatan = () => {
     }
 }
 
-export const dataMapel = () => {
-    try{
-        return async dispatch => {
-            console.log(`${baseUrl}/api/all-mapel`);
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/all-mapel`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: DATAMAPEL,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const dataMapel = () => 
+    UseGetAction(
+        'all-mapel',
+        DATAMAPEL, 
+        undefined,
+    );
+
+// export const dataMapel = () => {
+//     try{
+//         return async dispatch => {
+//             console.log(`${baseUrl}/api/all-mapel`);
+//             await AsyncStorage.getItem('userData')
+//             .then(value => {
+//                 if(value != null){
+//                     let data = JSON.parse(value);
+//                     axios.get(
+//                         `${baseUrl}/api/all-mapel`, 
+//                         {
+//                             headers: {
+//                                 'Content-Type': 'application/json',
+//                                 'Authorization': 'Bearer ' + data.access_token
+//                             }
+//                         }
+//                     ).then(function(response){
+//                         if(response.data.status === "success"){
+//                             dispatch({
+//                                 type: DATAMAPEL,
+//                                 payload: response.data.data,
+//                             });
+//                         }
+//                     }).catch(function(error){
+//                         console.log(error);
+//                     });
+//                 }
+//             })
+//         }
+//     }catch(error){
+//         console.log(error);
+//     }
+// }
 
 export const addNewMapel = (request) => async (dispatch) => {
     try{

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, Image, PermissionsAndroid, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, PermissionsAndroid, Modal, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch, useSelector } from 'react-redux';
 import tw from 'twrnc';
-import { correctStudentAnswer, detailAnswer, detailScore } from '../redux/actions/exam-actions';
+import { correctStudentAnswer, detailAnswer, detailScore, updateDetailAnswer, updateStudentScore } from '../redux/actions/exam-actions';
 import DocumentPicker from "react-native-document-picker";
 import { isImage } from '../utils/function';
 import { customStyle } from '../utils/style';
@@ -26,6 +26,9 @@ const CorrectAnswer = ({navigation, route}) => {
     const [previewVisible, setIsPreviewVisible] = useState(false);
     const [indexQuestion, setIndexQuestion] = useState(1);
     const [statusDownload, setStatusDownload] = useState(false);
+    const [updateAnswer, setUpdateAnswer] = useState("");
+    const [updateAnswerModal, setUpdateAnswerModal] = useState(false);
+    const [nilaiSiswa, setNilaiSiswa] = useState(0);
     
     const {load_exam, correct_student_answer, detail_score, detail_answer} = useSelector((state) => state.examReducer);
 
@@ -37,6 +40,14 @@ const CorrectAnswer = ({navigation, route}) => {
     useEffect(() => {
         loadData();
     }, []);
+
+    useEffect(() => {
+        if(Object.keys(detail_score).length > 0){
+            setNilaiSiswa(detail_score.nilai);
+        }
+    }, [detail_score]);
+
+    console.log("nilai : ", nilaiSiswa);
 
     useEffect(() => {
         if(Object.keys(correct_student_answer).length > 0){
@@ -52,8 +63,11 @@ const CorrectAnswer = ({navigation, route}) => {
         setIndexQuestion(index);
         setQuestionType(type);
         setQuestion(question);
-        dispatch(detailAnswer(id_ujian, id_siswa, question.id));
-        console.log("id soal : ", question.id);
+        dispatch(detailAnswer(id_ujian, id_siswa, question.id)).then(response => {
+            if(response.status === "success"){
+                setUpdateAnswer(response.data.koreksi_jawaban);
+            }
+        });
     }
 
     const previewImage = (image) => {
@@ -61,6 +75,40 @@ const CorrectAnswer = ({navigation, route}) => {
         listImage.push({uri: baseUrl + image});
         setImagePreview(listImage);
         setIsPreviewVisible(true);
+    }
+
+    const updateCorrectAnswer = () => {
+        if(updateAnswer == "" || updateAnswer == null){
+            Alert.alert('Error', 'Koreksi jawaban tidak boleh kosong!');
+        }else{
+            let data = {
+                id_ujian: id_ujian,
+                id_siswa: id_siswa,
+                id_soal: question.id,
+                koreksi_jawaban: updateAnswer,
+            }
+            
+            dispatch(updateDetailAnswer(data));
+        }
+    }
+
+    const hideUpdateAnswerModal = () => {
+        setUpdateAnswerModal(false);
+    }
+
+    const updateNilaiSiswa = () => {
+        let data = {
+            id_ujian: id_ujian,
+            id_siswa: id_siswa,
+            nilai: nilaiSiswa
+        }
+        let res = dispatch(updateStudentScore(data))
+        .then(response => {
+            if(response.status === "success"){
+                console.log("res : ", response);
+                navigation.goBack();
+            }
+        })
     }
 
     const checkPermission = async (fileUrl) => {
@@ -141,7 +189,12 @@ const CorrectAnswer = ({navigation, route}) => {
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
                 <Text style={tw`text-center text-lg mr-5`}>Koreksi Jawaban</Text>
-                <View></View>
+                <TouchableOpacity 
+                    onPress={() => { setUpdateAnswerModal(true) }}
+                    style={tw`px-2`}
+                >
+                    <Icon name={'check'} size={20} color="#000000" />
+                </TouchableOpacity>
             </View>
             <ScrollView>
                 <View style={tw`px-4`}>
@@ -182,19 +235,19 @@ const CorrectAnswer = ({navigation, route}) => {
                             <View>
                                 <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
                                     <Text>a. {question.pilihan_a}</Text>
-                                    {detail_answer.jawaban_siswa == 'a' && <Icon name={'check'} size={20} color="#000000" />}
+                                    {detail_answer.jawaban_siswa == 'a' && <Icon name={'check'} size={12} color="#000000" />}
                                 </View>
                                 <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
                                     <Text>b. {question.pilihan_b}</Text>
-                                    {detail_answer.jawaban_siswa == 'b' && <Icon name={'check'} size={20} color="#000000" />}
+                                    {detail_answer.jawaban_siswa == 'b' && <Icon name={'check'} size={12} color="#000000" />}
                                 </View>
                                 <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
                                     <Text>c. {question.pilihan_c}</Text>
-                                    {detail_answer.jawaban_siswa == 'c' && <Icon name={'check'} size={20} color="#000000" />}
+                                    {detail_answer.jawaban_siswa == 'c' && <Icon name={'check'} size={12} color="#000000" />}
                                 </View>
                                 <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
                                     <Text>d. {question.pilihan_d}</Text>
-                                    {detail_answer.jawaban_siswa == 'd' && <Icon name={'check'} size={20} color="#000000" />}
+                                    {detail_answer.jawaban_siswa == 'd' && <Icon name={'check'} size={12} color="#000000" />}
                                 </View>
                             </View>
                         }
@@ -253,23 +306,83 @@ const CorrectAnswer = ({navigation, route}) => {
                             <Text>{detail_answer.jawaban_siswa}</Text>
                         )}
                          
-                        <Text style={tw`mt-3`}>Koreksi Jawaban : </Text>
-                        {questionType == 1 ? (
-                            <Text>{question.jawaban == 'a' ? (
-                                'a. ' + question.pilihan_a
-                            ) : question.jawaban == 'b' ? (
-                                'b. ' + question.pilihan_b
-                            ) : question.jawaban == 'c' ? (
-                                'c. ' + question.pilihan_c
-                            ) : question.jawaban == 'd' ? (
-                                'd. ' + question.pilihan_d
-                            ) : null}</Text>
-                        ) : (
-                            null
-                        )}
+                        {questionType == 2 ? (
+                            // <Text>{question.jawaban == 'a' ? (
+                            //     'a. ' + question.pilihan_a
+                            //     ) : question.jawaban == 'b' ? (
+                            //         'b. ' + question.pilihan_b
+                            // ) : question.jawaban == 'c' ? (
+                            //     'c. ' + question.pilihan_c
+                            //     ) : question.jawaban == 'd' ? (
+                            //         'd. ' + question.pilihan_d
+                            //     ) : null}</Text>
+                            // ) : (
+                            <View>
+                                <Text style={tw`mt-3 mb-1`}>Koreksi Jawaban : </Text>
+                                <TextInput
+                                    multiline
+                                    numberOfLines={4}
+                                    onChangeText={e => setUpdateAnswer(e)}
+                                    value={updateAnswer}
+                                    style={tw`border border-gray-300 rounded p-2`}
+                                />
+                                
+                                <TouchableOpacity 
+                                    onPress={() => updateCorrectAnswer()}
+                                    style={tw`bg-teal-500 mt-3 p-3 rounded`}
+                                >
+                                    <Text style={tw`text-center text-white`}>Koreksi jawaban</Text>
+                                </TouchableOpacity>
+                                
+                            </View>
+                        ) : null}
                     </View>
                 </View>
             </ScrollView>
+
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={updateAnswerModal}
+              onRequestClose={() => {
+                setUpdateAnswerModal(false);
+              }}
+          >
+              <View style={customStyle.centeredView}>
+                <View style={customStyle.modalView}>
+                    <Text style={tw`text-xl font-bold mb-4`}>Nilai Siswa</Text>
+                    <View style={tw`w-full mb-4`}>
+                      <TextInput
+                        onChangeText={(e => setNilaiSiswa(e))}
+                        value={String(nilaiSiswa)}
+                        style={tw`w-full border border-gray-400 rounded-lg px-4`}
+                        keyboardType="numeric"
+                      />
+                      {nilaiSiswa === "" ? (
+                        <Text style={tw`text-red-500`}>Tidak boleh kosong</Text>
+                      ) : null}
+                    </View>
+
+                    <View style={tw`flex flex-row`}>
+                      <TouchableOpacity 
+                        onPress={hideUpdateAnswerModal}
+                        style={tw`bg-gray-500 p-2 w-2/5 rounded-lg mr-1`}
+                      >
+                        <Text style={tw`text-white text-center text-lg`}>Batal</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                            updateNilaiSiswa();
+                        }}
+                        style={tw`bg-blue-500 p-2 w-2/5 rounded-lg ml-1`}
+                      >
+                        <Text style={tw`text-white text-center text-lg`}>Simpan</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                </View>
+              </View>
+          </Modal>
         </View>
     )
 }

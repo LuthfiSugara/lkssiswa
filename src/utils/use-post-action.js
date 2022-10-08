@@ -1,7 +1,8 @@
 import { API } from './config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ToastAndroid } from 'react-native';
 
-export const UseGetAction = (url, type, queries) => async(dispatch) => {
+export const UsePostAction = (url, type, queries, request) => async(dispatch) => {
     try{
         let qr = '?';
         if(queries != undefined){
@@ -19,14 +20,6 @@ export const UseGetAction = (url, type, queries) => async(dispatch) => {
                 token = data.access_token;
             }
         });
-
-        await dispatch({
-            type: type,
-            payload: {
-                loading: true,
-                data : [],
-            }
-        });
         
         const config = {
             headers: {
@@ -34,17 +27,17 @@ export const UseGetAction = (url, type, queries) => async(dispatch) => {
                 'Authorization': 'Bearer ' + token
             }
         };
-
-        const response = await API(url, config);
-        console.log("response : ", response.data);
+        
+        const response = await API.post(url, request, config);
+        console.log("response : ", response);
         if(response.data.status == 'success'){
-            await dispatch({
-                type: type,
-                payload: {
-                    loading: false,
-                    data: response.data.data
-                }
-            });
+            ToastAndroid.showWithGravityAndOffset(
+                response.data.message,
+                ToastAndroid.LONG,
+                ToastAndroid.TOP,
+                25,
+                50
+            );
         }
 
         return response.data;

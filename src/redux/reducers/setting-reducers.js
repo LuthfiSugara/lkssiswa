@@ -8,7 +8,7 @@ import {
 } from "../types/setting";
 
 const initialState = {
-    loading: true,
+    load_setting: true,
     data_kelas: [],
     detail_kelas: [],
     data_jk: [],
@@ -22,38 +22,38 @@ const settingReducer = (state = initialState, action) => {
         case DATAKELAS:
             return {
                 ...state,
-                loading: false,
-                data_kelas: action.payload
+                load_setting: action.payload.loading,
+                data_kelas: action.payload.data
             }
         case GETCLASSBYTEACHERID:
             return {
                 ...state,
-                loading: false,
-                class_by_teacher_id: action.payload
+                load_setting: action.payload.loading,
+                class_by_teacher_id: action.payload.data
             }
         case DETAILKELAS:
             return {
                 ...state,
-                loading: false,
-                detail_kelas: action.payload
+                load_setting: action.payload.loading,
+                detail_kelas: action.payload.data
             }
         case DATAJK:
             return {
                 ...state,
-                loading: false,
-                data_jk: action.payload
+                load_setting: action.payload.loading,
+                data_jk: action.payload.data
             }
         case DATAJABATAN:
             return {
                 ...state,
-                loading: false,
-                data_jabatan: action.payload
+                load_setting: action.payload.loading,
+                data_jabatan: action.payload.data
             }
         case DATAMAPEL:
             return {
                 ...state,
-                loading: false,
-                data_mapel: action.payload
+                load_setting: action.payload.loading,
+                data_mapel: action.payload.data
             }
         default: 
             return state;

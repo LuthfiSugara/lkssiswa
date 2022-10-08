@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import tw from "twrnc";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useFormik } from "formik";
@@ -12,6 +12,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import {launchImageLibrary} from 'react-native-image-picker';
 import { register } from "../redux/actions/auth-actions";
 import RBSheet from "react-native-raw-bottom-sheet";
+import Loader from "../components/loader";
+import { customStyle } from "../utils/style";
 
 const options = {
     title: "Select Image",
@@ -44,8 +46,9 @@ const TambahGuru = ({navigation, route}) => {
     const [arrKelas, setArrKelas] = useState([]);
     const [selectArrKelasName, setSelectArrKelasName] = useState([]);
     const [selectMapelName, setSelectMapelName] = useState("");
+    const [previewImage, setPreviewImage] = useState(null);
 
-    const {loading, data_jk, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
+    const {load_setting, data_jk, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
 
     const loadData = async() => {
         await dispatch(dataJK());
@@ -163,7 +166,7 @@ const TambahGuru = ({navigation, route}) => {
         const images = await launchImageLibrary(options);
         if(!images.didCancel){
             setFoto(images);
-            console.log("images : ",images);
+            setPreviewImage(images.assets[0].uri);
         }
         
     }
@@ -193,13 +196,15 @@ const TambahGuru = ({navigation, route}) => {
         }
     }
     
-    return (
+    return load_setting ? (
+        <Loader/>
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Guru</Text>
+                <Text style={tw`text-center mr-5`}>Tambah Guru</Text>
                 <View></View>
             </View>
 
@@ -207,7 +212,6 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Nama Lengkap</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'user-circle'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.nama}
                             onChangeText={(event) => setFieldValue('nama', event)}
@@ -222,7 +226,6 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Username</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'user-cog'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.username}
                             onChangeText={(event) => setFieldValue('username', event)}s
@@ -237,18 +240,14 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Password</Text>
                     <View style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}>
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'lock'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
                         <TextInput
                             value={values.password}
                             onChangeText={(event) => setFieldValue('password', event)}
                             secureTextEntry={showPassword}
                             style={tw`w-4/5 px-2`}
                         />
-                        <View style={[styles.w10, tw`border-l border-gray-300 h-full`]}>
-                            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#0096FF" style={tw`p-2 py-4`} onPress={changeIconPassword} />
-                        </View>
+                        
+                        <Icon name={showPassword ? "eye-slash" : "eye"} size={15} color="#090909" style={tw`p-4`} onPress={changeIconPassword} />
                     </View>
                     {touched.password && errors.password &&
                         <Text style={tw`text-xs text-red-600`}>{errors.password}</Text>
@@ -258,7 +257,6 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Tempat Lahir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-book'} size={20} color="#0096FF" style={tw`px-3`} />
                         <TextInput
                             value={values.tempat_lahir}
                             onChangeText={(event) => setFieldValue('tempat_lahir', event)}s
@@ -276,7 +274,6 @@ const TambahGuru = ({navigation, route}) => {
                         onPress={showDatepicker}
                         style={tw`flex flex-row border border-gray-300 rounded-md items-center`}
                     >
-                        <Icon name={'calendar-check'} size={20} color="#0096FF" style={tw`px-4`} />
                         <Text style={tw`border-l border-gray-300 p-4`}>{values.tanggal_lahir ? format(new Date(date), 'dd/MM/yyyy') : ""}</Text>
                     </Pressable>
                     {touched.tanggal_lahir && errors.tanggal_lahir &&
@@ -287,7 +284,6 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Nomor Handphone</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'phone'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.no_hp}
                             onChangeText={(event) => setFieldValue('no_hp', event)}
@@ -302,7 +298,6 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text>Alamat</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.alamat}
                             onChangeText={(event) => setFieldValue('alamat', event)}
@@ -316,27 +311,23 @@ const TambahGuru = ({navigation, route}) => {
 
                 <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Jenis Kelamin</Text>
-                    <View style={tw`flex flex-row border border-gray-300 rounded items-center`}>
-                        <Icon name={'venus-mars'} size={20} color="#0096FF" style={tw`p-4`} />
-                        <Dropdown
-                            style={[styles.dropdown, isFocus && { borderColor: 'gray' }]}
-                            data={listJK}
-                            search={false}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField={gender}
-                            placeholder={!isFocus ? gender : '...'}
-                            value={gender}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            onChange={item => {
-                                setIsFocus(false);
-                                setFieldValue('id_jenis_kelamin', item.value);
-                                setGender(item.label);
-                                console.log()
-                            }}
-                        />
-                    </View>
+                    <Dropdown
+                        style={[styles.dropdown, isFocus && { border: '1px', borderColor: 'gray' }]}
+                        data={listJK}
+                        search={false}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField={gender}
+                        placeholder={!isFocus ? gender : '...'}
+                        value={gender}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={item => {
+                            setIsFocus(false);
+                            setFieldValue('id_jenis_kelamin', item.value);
+                            setGender(item.label);
+                        }}
+                    />
                     {touched.id_jenis_kelamin && errors.id_jenis_kelamin &&
                         <Text style={tw`text-xs text-red-600`}>{errors.id_jenis_kelamin}</Text>
                     }
@@ -345,7 +336,6 @@ const TambahGuru = ({navigation, route}) => {
                 <View style={tw`mb-4`}>
                     <Text style={tw`mb-1`}>Pendidikan Terakhir</Text>
                     <View style={tw`flex flex-row border border-gray-300 rounded-md items-center`}>
-                        <Icon name={'address-card'} size={20} color="#0096FF" style={tw`px-4`} />
                         <TextInput
                             value={values.pendidikan_terakhir}
                             onChangeText={(event) => setFieldValue('pendidikan_terakhir', event)}
@@ -363,9 +353,6 @@ const TambahGuru = ({navigation, route}) => {
                         style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}
                         onPress={() => onSelectBottomSheet("kelas")} 
                     >
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'university'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
                         <Text
                             style={tw`w-4/5 px-2`}
                         >{selectArrKelasName.length > 2 ? selectArrKelasName.toString() + '...' : selectArrKelasName.toString()}</Text>
@@ -384,25 +371,32 @@ const TambahGuru = ({navigation, route}) => {
                         style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}
                         onPress={() => onSelectBottomSheet("mapel")} 
                     >
-                        <View style={[styles.w10, tw`border-r border-gray-300 h-full`]}>
-                            <Icon name={'book-open'} size={20} color="#0096FF" style={tw`p-4`} />
-                        </View>
-                        <Text style={tw`w-4/5 px-2`}>{selectMapelName}</Text>
-                        <View style={[styles.w10, tw`h-full`]}>
-                            <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
-                        </View>
+                        <Text style={tw`w-full p-4`}>{selectMapelName}</Text>
                     </Pressable>
                     {touched.id_mapel && errors.id_mapel &&
                         <Text style={tw`text-xs text-red-600`}>{errors.id_mapel}</Text>
                     }
                 </View>
 
-                <View style={tw`flex flex-row justify-center mt-4 mb-12`}>
+                <View style={tw`flex flex-row justify-center mt-4`}>
                     <TouchableOpacity
                         onPress={openGallery}
-                        style={[styles.shadowUpload, tw`w-1/3 rounded-full p-4`]}
+                        style={[tw`rounded-full p-4`]}
                     >
-                        <Icon name={'cloud-upload-alt'} size={50} color="#0096FF" style={tw`px-3 text-center`} />
+                        <View style={tw`w-full flex flex-row justify-center`}>
+                            <Image
+                                style={[tw`w-3/4 h-32 rounded-lg`, customStyle.aspectSquare]}
+                                source={
+                                    previewImage == null ? (
+                                        require('../assets/images/image.jpg')
+                                    ) : (
+                                        {
+                                            uri: previewImage,
+                                        }
+                                    )
+                                }
+                            />
+                        </View>
                         <Text style={tw`text-center`}>Upload Foto</Text>
                     </TouchableOpacity>
                 </View>
@@ -435,7 +429,7 @@ const TambahGuru = ({navigation, route}) => {
                                         onPress={() => {
                                             selectArrKelas(kelas.id, kelas.name);
                                         }}
-                                        style={tw`${checkKelas(kelas.id) ? "border-blue-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
+                                        style={tw`${checkKelas(kelas.id) ? "border-teal-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
                                         key={index}
                                      >
                                         <Text>{kelas.name}</Text>
@@ -451,9 +445,8 @@ const TambahGuru = ({navigation, route}) => {
                                         onPress={() => {
                                             setFieldValue('id_mapel', mapel.id);
                                             setSelectMapelName(mapel.name);
-                                            // refRBSheet.current.close();
                                         }}
-                                        style={tw`${mapel.id === values.id_mapel ? "border-blue-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
+                                        style={tw`${mapel.id === values.id_mapel ? "border-teal-500" : "border-gray-400"} border rounded-lg p-4 mr-2 mb-2`}
                                         key={index}
                                      >
                                         <Text>{mapel.name}</Text>
@@ -468,10 +461,10 @@ const TambahGuru = ({navigation, route}) => {
             </RBSheet>
 
             <TouchableOpacity 
-                style={ tw`bg-blue-500 p-2 rounded-md mb-4 mx-4`}
+                style={ tw`bg-teal-500 p-2 rounded-md mb-4 mx-4`}
                 onPress={handleSubmit}
             >
-                <Text style={tw`text-white font-semibold text-center text-lg`}>Simpan</Text>
+                <Text style={tw`text-white font-semibold text-center text-lg`}>Tambah</Text>
             </TouchableOpacity>
         </View>
     )
@@ -483,9 +476,11 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         height: 50,
-        width: '88%',
+        width: '100%',
         borderRadius: 4,
         paddingHorizontal: 8,
+        borderWidth: 1,
+        borderColor: '#c3c1c1'
     },
     shadowUpload: { 
         shadowColor: 'black',
