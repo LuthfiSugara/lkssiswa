@@ -4,6 +4,7 @@ import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch, useSelector } from "react-redux";
 import { addNewMapel, dataMapel, editMataPelajaran } from "../redux/actions/setting-actions";
+import Loader from "../components/loader";
 
 const ListMapel = ({navigation}) => {
     const dispatch = useDispatch();
@@ -13,7 +14,7 @@ const ListMapel = ({navigation}) => {
     const [ubahMapel, setUbahMapel] = useState("");
     const [idMapel, setIdMapel] = useState("");
 
-    const {loading, data_mapel} = useSelector((state) => state.settingReducer);
+    const {load_setting, data_mapel} = useSelector((state) => state.settingReducer);
 
     const loadData = async() => {
         await dispatch(dataMapel());
@@ -60,19 +61,20 @@ const ListMapel = ({navigation}) => {
         })
     }
 
-    console.log("mapel : ", data_mapel);
-    return (
+    return load_setting ? (
+        <Loader/>
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Daftar Mata Pelajaran</Text>
+                <Text style={tw`text-center mr-5`}>Daftar Mata Pelajaran</Text>
                 <Pressable 
                     onPress={() => setModalAddMapel(true)}
                     style={tw`py-2 px-4`}
                 >
-                    <Icon name={'plus'} size={25} color="#2196f3" />
+                    <Icon name={'plus-square'} size={25} color="#000000" />
                 </Pressable>
             </View>
 
@@ -85,7 +87,7 @@ const ListMapel = ({navigation}) => {
                         key={index}
                     >
                         <View style={tw`flex flex-row items-center`}>
-                            <Text style={tw`text-lg text-black ml-2`}>{mapel.name}</Text>
+                            <Text style={tw`text-black ml-2`}>{mapel.name}</Text>
                         </View>
                         <TouchableOpacity onPress={() => {
                             setModalEditMapel(true);
@@ -93,7 +95,7 @@ const ListMapel = ({navigation}) => {
                             setIdMapel(mapel.id);
                         }}
                         >
-                            <Icon name={'edit'} size={25} color="#2196f3" />
+                            <Icon name={'edit'} size={15} color="#14b8a6" />
                         </TouchableOpacity>
                     </View>
                 )
@@ -131,7 +133,7 @@ const ListMapel = ({navigation}) => {
                             </Pressable>
                             <Pressable
                                 onPress={addMapel}
-                                style={tw`bg-blue-500 p-2 w-2/5 rounded-lg ml-1`}
+                                style={tw`bg-teal-500 p-2 w-2/5 rounded-lg ml-1`}
                             >
                                 <Text style={tw`text-white text-center text-lg`}>Simpan</Text>
                             </Pressable>
@@ -172,7 +174,7 @@ const ListMapel = ({navigation}) => {
                             </Pressable>
                             <Pressable
                                 onPress={editMapel}
-                                style={tw`bg-blue-500 p-2 w-2/5 rounded-lg ml-1`}
+                                style={tw`bg-teal-500 p-2 w-2/5 rounded-lg ml-1`}
                             >
                                 <Text style={tw`text-white text-center text-lg`}>Simpan</Text>
                             </Pressable>

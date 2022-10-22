@@ -6,13 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getStudentScoreDetail } from '../redux/actions/exam-actions';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import Loader from '../components/loader';
+import { useIsFocused } from "@react-navigation/native";
 
 const NilaiSiswaDetail = ({navigation, route}) => {
     const {id_ujian} = route.params;
     const dispatch = useDispatch();
+    const isFocused = useIsFocused();
 
     const {load_exam, student_score_detail} = useSelector((state) => state.examReducer);
     const [detail, setDetail] = useState([]);
+    const [mapel, setMapel] = useState([]);
 
     const loadData = async() => {
         await dispatch(getStudentScoreDetail(id_ujian));
@@ -20,11 +24,12 @@ const NilaiSiswaDetail = ({navigation, route}) => {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [isFocused]);
 
     useEffect(() => {
-        if(Object.keys(student_score_detail).length > 0){
-            setDetail(student_score_detail.nilai);
+        if(student_score_detail.length > 0){
+            setDetail(student_score_detail[0].nilai);
+            setMapel(student_score_detail[0].mapel);
         }
     }, [student_score_detail]);
 
@@ -36,17 +41,14 @@ const NilaiSiswaDetail = ({navigation, route}) => {
     }
 
     return load_exam ? (
-        <View style={tw`flex flex-1 justify-center items-center`}>
-            <ActivityIndicator size="large" color="#ff1402" />
-            <Text style='text-center'>Loading....</Text>
-        </View>
+        <Loader/>
       ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Nilai Siswa</Text>
+                <Text style={tw`text-center mr-5`}>Nilai Siswa</Text>
                 <View></View>
             </View>
             <ScrollView>
@@ -57,6 +59,18 @@ const NilaiSiswaDetail = ({navigation, route}) => {
                                 <View>
                                     <Text style={tw`text-lg text-black`}>{detail.siswa.nama}</Text>
                                     <Text>{"Nilai : "} {detail.nilai}</Text>
+                                    <Text>{"Mapel : "} {mapel.name}</Text>
+                                    <Text>
+                                        {student_score_detail.id_jenis_ujian == 1 ? (
+                                            "Ulangan"
+                                        ) : student_score_detail.id_jenis_ujian == 1 ? (
+                                            "Latihan"
+                                        ) : student_score_detail.id_jenis_ujian == 1 ? (
+                                            "Tugas"
+                                        ) : (
+                                            "Kuis"
+                                        )}
+                                    </Text>
                                 </View>
                                 <TouchableOpacity onPress={() => redirectToCorrectAnswer(detail.id_siswa)}>
                                     <Text style={tw`bg-teal-500 text-white p-2 rounded`}>Koreksi</Text>

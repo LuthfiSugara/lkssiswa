@@ -18,12 +18,12 @@ const TambahSoalPG = ({navigation, route}) => {
         initialValues: {
             id_ujian: id_ujian,
             id_jenis_soal: 1,
-            pertanyaan: 'test pertanyaan pg',
-            pilihan_a: 'pilihan a',
-            pilihan_b: 'pilihan b',
-            pilihan_c: 'pilihan c',
-            pilihan_d: 'pilihan d',
-            jawaban: 'b',
+            pertanyaan: '',
+            pilihan_a: '',
+            pilihan_b: '',
+            pilihan_c: '',
+            pilihan_d: '',
+            jawaban: '',
         },
         onSubmit: values => {
             const formData = new FormData();
@@ -46,7 +46,6 @@ const TambahSoalPG = ({navigation, route}) => {
                 }
             }
 
-            console.log("form : ", formData);
             dispatch(createExamQuestions(formData))
             .then(response => {
                 if(response.status === "success"){
@@ -96,7 +95,7 @@ const TambahSoalPG = ({navigation, route}) => {
                 <Pressable style={[customStyle.shadow, tw`py-2 px-4 rounded-full`]} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Soal Pilihan Ganda</Text>
+                <Text style={tw`text-center mr-5`}>Tambah Soal Pilihan Ganda</Text>
                 <View></View>
             </View>
 
@@ -128,7 +127,7 @@ const TambahSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "a" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "a")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -149,7 +148,7 @@ const TambahSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "b" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "b")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -170,7 +169,7 @@ const TambahSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "c" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "c")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -191,7 +190,7 @@ const TambahSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "d" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "d")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -210,7 +209,7 @@ const TambahSoalPG = ({navigation, route}) => {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity onPress={handleSubmit} style={tw`w-full bg-blue-500 rounded p-2 mt-6`}>
+                    <TouchableOpacity onPress={handleSubmit} style={tw`w-full bg-teal-500 rounded p-2 mt-6`}>
                         <Text style={tw`text-white text-center`}>Tambah</Text>
                     </TouchableOpacity>
                 </View>

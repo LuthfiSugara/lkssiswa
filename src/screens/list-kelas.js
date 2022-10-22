@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { dataKelas, editKelas, tambahKelas } from "../redux/actions/setting-actions";
 import { useEffect } from "react";
 import { useIsFocused } from "@react-navigation/native";
+import Loader from "../components/loader";
 
 const ListKelas = ({navigation}) => {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const ListKelas = ({navigation}) => {
   const [ubahNamakelas, setUbahNamakelas] = useState("");
   const [idkelas, setIdKelas] = useState("");
 
-  const {loading, data_kelas} = useSelector((state) => state.settingReducer);
+  const {load_setting, data_kelas} = useSelector((state) => state.settingReducer);
 
   const loadData = async() => {
       await dispatch(dataKelas());
@@ -62,18 +63,20 @@ const ListKelas = ({navigation}) => {
     })
   }
 
-  return (
+  return load_setting ? (
+    <Loader/>
+  ) : (
       <View style={tw`bg-white h-full`}>
           <View style={tw`flex flex-row justify-between items-center p-2`}>
               <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                   <Icon name={'angle-left'} size={25} color="#000000" />
               </Pressable>
-              <Text style={tw`text-center text-lg mr-5`}>Daftar Kelas</Text>
+              <Text style={tw`text-center mr-5`}>Daftar Kelas</Text>
               <Pressable 
                 onPress={() => setModalAddClass(true)}
                 style={tw`py-2 px-4`}
               >
-                <Icon name={'plus'} size={25} color="#2196f3" />
+                <Icon name={'plus-square'} size={25} color="#000000" />
               </Pressable>
           </View>
           <ScrollView style={tw`px-4 mt-4`}>
@@ -85,7 +88,7 @@ const ListKelas = ({navigation}) => {
                     key={index}
                 >
                     <View style={tw`flex flex-row items-center`}>
-                        <Text style={tw`text-lg text-black ml-2`}>{kelas.name}</Text>
+                        <Text style={tw`text-black ml-2`}>{kelas.name}</Text>
                     </View>
                     <TouchableOpacity onPress={() => {
                         setModalEditClass(true);
@@ -93,7 +96,7 @@ const ListKelas = ({navigation}) => {
                         setIdKelas(kelas.id);
                       }}
                     >
-                        <Icon name={'edit'} size={25} color="#2196f3" />
+                        <Icon name={'edit'} size={15} color="#14b8a6" />
                     </TouchableOpacity>
                 </View>
               )
@@ -131,7 +134,7 @@ const ListKelas = ({navigation}) => {
                       </Pressable>
                       <Pressable
                         onPress={tambahKelasBaru}
-                        style={tw`bg-blue-500 p-2 w-2/5 rounded-lg ml-1`}
+                        style={tw`bg-teal-500 p-2 w-2/5 rounded-lg ml-1`}
                       >
                         <Text style={tw`text-white text-center text-lg`}>Simpan</Text>
                       </Pressable>
@@ -172,7 +175,7 @@ const ListKelas = ({navigation}) => {
                       </Pressable>
                       <Pressable 
                         onPress={editNamaKelas}
-                        style={tw`bg-blue-500 p-2 w-2/5 rounded-lg ml-1`}
+                        style={tw`bg-teal-500 p-2 w-2/5 rounded-lg ml-1`}
                       >
                         <Text style={tw`text-white text-center text-lg`}>Simpan</Text>
                       </Pressable>

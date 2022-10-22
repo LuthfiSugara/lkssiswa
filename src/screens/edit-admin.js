@@ -76,6 +76,7 @@ const EditAdmin = ({navigation, route}) => {
         },
         onSubmit: values => {
             const formData = new FormData();
+            formData.append('id', userId);
             formData.append('nama', values.nama);
             formData.append('username', values.username);
             if(values.password != ''){
@@ -95,7 +96,7 @@ const EditAdmin = ({navigation, route}) => {
                 });
             }
             
-            dispatch(editProfileUser(userId, formData))
+            dispatch(editProfileUser(formData))
             .then(response => {
                 if(response.status === "success"){
                     navigation.goBack();
@@ -167,7 +168,7 @@ const EditAdmin = ({navigation, route}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Edit Admin</Text>
+                <Text style={tw`text-center mr-5`}>Edit Admin</Text>
                 <View></View>
             </View>
 

@@ -10,6 +10,7 @@ import ImageView from "react-native-image-viewing";
 import RNFetchBlob from 'rn-fetch-blob';
 import { getProfile } from '../redux/actions/auth-actions';
 import { useIsFocused } from "@react-navigation/native";
+import Loader from '../components/loader';
 
 const ExamWork = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -22,16 +23,17 @@ const ExamWork = ({navigation, route}) => {
     const [numberOfQuestion, setnumberOfQuestion] = useState('1');
     const [loadPage, setLoadPage] = useState(false);
     const [essayAnswer, setEssayAnswer] = useState('');
+    const [detail, setDetail] = useState([]);
 
-    const {exam_results_answer, exam_pg, exam_essay, detail_question} = useSelector((state) => state.examReducer);
+    const {load_exam, exam_results_answer, exam_pg, exam_essay, detail_question} = useSelector((state) => state.examReducer);
 
     const loadData = () => {
         dispatch(getExamQuestionsPG(id_ujian, 1));
         dispatch(getExamQuestionsEssay(id_ujian, 2));
-        if(exam_pg.length > 0){
-            dispatch(getDetailQuestion(exam_pg[0].id));
-            dispatch(getExamResultsAnswer(id_siswa, id_ujian, exam_pg[0].id));
-        }
+        // if(exam_pg.length > 0){
+        //     dispatch(getDetailQuestion(exam_pg[0].id));
+        //     dispatch(getExamResultsAnswer(id_siswa, id_ujian, exam_pg[0].id));
+        // }
     }
 
     useEffect(() => {
@@ -42,6 +44,19 @@ const ExamWork = ({navigation, route}) => {
         dispatch(getDetailQuestion(id));
         dispatch(getExamResultsAnswer(id_siswa, id_ujian, id));
     }
+
+    useEffect(() => {
+        if(exam_pg.length > 0){
+            dispatch(getDetailQuestion(exam_pg[0].id));
+            dispatch(getExamResultsAnswer(id_siswa, id_ujian, exam_pg[0].id));
+        }
+    }, [exam_pg]);
+
+    useEffect(() => {
+        if(detail_question.length > 0){
+            setDetail(detail_question[0].detail);
+        }
+    }, [detail_question]);
 
     const updateAnswer = (id, answer) => {
         dispatch(updateExamResultsAnswer({jawaban_siswa: answer}, id_siswa, id_ujian, id));
@@ -131,17 +146,15 @@ const ExamWork = ({navigation, route}) => {
         return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
     };
 
-    return loadPage ? (
-        <View style={tw`flex-1 justify-center`}>
-            <ActivityIndicator size="small" color="#03a9f4" />
-        </View>
+    return load_exam ? (
+        <Loader/>
     ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Soal</Text>
+                <Text style={tw`text-center mr-5`}>Soal</Text>
                 <View></View>
             </View>
 
@@ -161,7 +174,7 @@ const ExamWork = ({navigation, route}) => {
                                                 setnumberOfQuestion(index + 1);
                                             }}
                                         >
-                                            <Text style={tw`${exam.result.jawaban_siswa != null ? 'bg-green-500' : 'bg-gray-500' } text-white text-center p-2 rounded`}>{index + 1}</Text>
+                                            <Text style={tw`${exam?.result?.jawaban_siswa != null ? 'bg-teal-500' : 'bg-gray-500' } text-white text-center p-2 rounded`}>{exam.id}</Text>
                                         </TouchableOpacity>
                                     )
                                 })}
@@ -183,7 +196,7 @@ const ExamWork = ({navigation, route}) => {
                                                 setnumberOfQuestion(index + 1);
                                             }}
                                         >
-                                            <Text style={tw`${exam?.result?.jawaban_siswa != null ? 'bg-green-500' : 'bg-gray-500' } text-white text-center p-2 rounded`}>{index + 1}</Text>
+                                            <Text style={tw`${exam?.result?.jawaban_siswa != null ? 'bg-teal-500' : 'bg-gray-500' } text-white text-center p-2 rounded`}>{exam.id}</Text>
                                         </TouchableOpacity>
                                         
                                     )
@@ -195,8 +208,8 @@ const ExamWork = ({navigation, route}) => {
                     )}
                     
                     {exam_pg.length > 0 ? (
-                        <View style={tw`my-4`}>    
-                            {detail_question.length > 0 ? <Text style={tw`text-lg mb-2`}>{numberOfQuestion}. {detail_question.pertanyaan}</Text> : null}
+                        <View style={tw`my-8`}>    
+                            {detail_question.length > 0 ? <Text style={tw`text-sm mb-2`}>{numberOfQuestion}. {detail_question[0].pertanyaan}</Text> : null}
                             <ImageView
                                 images={imagesPeview}
                                 imageIndex={0}
@@ -206,7 +219,7 @@ const ExamWork = ({navigation, route}) => {
                             
                             <ScrollView horizontal={true} style={tw``}>
                                 <View style={tw`flex flex-row justify-start mb-2 w-full h-20`}>
-                                    {detail_question.detail.map((detail, index) => {
+                                    {detail.map((detail, index) => {
                                         return (
                                             splitFile(detail.name) ? (
                                                 <TouchableOpacity onPress={() => previewImage(detail.name)} style={tw`px-2`} key={index}>
@@ -236,47 +249,47 @@ const ExamWork = ({navigation, route}) => {
                                 </View>
                             </ScrollView>
                             
-                            {detail_question.id_jenis_soal == 1 ? (
+                            {detail_question.length > 0 && detail_question[0].id_jenis_soal == 1 ? (
                                 <View>
                                     <TouchableOpacity 
                                         onPress={() => {
-                                            updateAnswer(detail_question.id, 'a');
+                                            updateAnswer(detail_question[0].id, 'a');
                                         }}
                                         style={tw`flex flex-row justify-between border-b border-gray-300 my-2 pb-1`}
                                     >
-                                        <Text>a. {detail_question.pilihan_a}</Text>
-                                        {exam_results_answer.jawaban_siswa === "a" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                        <Text>a. {detail_question[0].pilihan_a}</Text>
+                                        {exam_results_answer.jawaban_siswa === "a" && <Icon name={'check'} size={15} color="#14b8a6" /> }
                                     </TouchableOpacity>
                                     
                                     
                                     <TouchableOpacity 
                                         onPress={() => {
-                                            updateAnswer(detail_question.id, 'b');
+                                            updateAnswer(detail_question[0].id, 'b');
                                         }}
                                         style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}
                                     >
-                                        <Text>b. {detail_question.pilihan_b}</Text>
-                                        {exam_results_answer.jawaban_siswa === "b" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                        <Text>b. {detail_question[0].pilihan_b}</Text>
+                                        {exam_results_answer.jawaban_siswa === "b" && <Icon name={'check'} size={15} color="#14b8a6" /> }
                                     </TouchableOpacity>
                                 
                                     <TouchableOpacity 
                                         onPress={() => {
-                                            updateAnswer(detail_question.id, 'c');
+                                            updateAnswer(detail_question[0].id, 'c');
                                         }}
                                         style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}
                                     >
-                                        <Text>c. {detail_question.pilihan_c}</Text>
-                                        {exam_results_answer.jawaban_siswa === "c" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                        <Text>c. {detail_question[0].pilihan_c}</Text>
+                                        {exam_results_answer.jawaban_siswa === "c" && <Icon name={'check'} size={15} color="#14b8a6" /> }
                                     </TouchableOpacity>
 
                                     <TouchableOpacity 
                                         onPress={() => {
-                                            updateAnswer(detail_question.id, 'd');
+                                            updateAnswer(detail_question[0].id, 'd');
                                         }}
                                         style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}
                                     >
-                                        <Text>d. {detail_question.pilihan_d}</Text>
-                                        {exam_results_answer.jawaban_siswa === "d" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                        <Text>d. {detail_question[0].pilihan_d}</Text>
+                                        {exam_results_answer.jawaban_siswa === "d" && <Icon name={'check'} size={15} color="#14b8a6" /> }
                                     </TouchableOpacity>
                                 </View>
                             ) : (
@@ -299,13 +312,13 @@ const ExamWork = ({navigation, route}) => {
                     
                 </View>
             </ScrollView>
-            {detail_question.id_jenis_soal == 2 ? (
+            {detail_question.length > 0 && detail_question[0].id_jenis_soal == 2 ? (
                 <View style={tw`m-8`}>
                     <TouchableOpacity 
                         onPress={() => {
-                            updateAnswer(detail_question.id, essayAnswer);
+                            updateAnswer(detail_question[0].id, essayAnswer);
                         }}
-                        style={tw`bg-green-500 rounded`}
+                        style={tw`bg-teal-500 rounded`}
                     >
                         <Text style={tw`text-white text-center p-3`}>Simpan</Text>
                     </TouchableOpacity>

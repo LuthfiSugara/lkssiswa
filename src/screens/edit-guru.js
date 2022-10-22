@@ -84,6 +84,7 @@ const EditGuru = ({navigation, route}) => {
 
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched, isValid} = useFormik({
         initialValues: {
+            id: userId,
             nama: detail_user.nama,
             username: detail_user.username,
             password: '',
@@ -98,6 +99,7 @@ const EditGuru = ({navigation, route}) => {
         },
         onSubmit: values => {
             const formData = new FormData();
+            formData.append('id', userId);
             formData.append('nama', values.nama);
             formData.append('username', values.username);
             if(values.password != ''){
@@ -121,9 +123,8 @@ const EditGuru = ({navigation, route}) => {
                 });
             }
             
-            dispatch(editProfileUser(userId, formData))
+            dispatch(editProfileUser(formData))
             .then(response => {
-                console.log("res : ", response);
                 if(response.status === "success"){
                     navigation.goBack();
                 }
@@ -166,7 +167,7 @@ const EditGuru = ({navigation, route}) => {
 
     const onChange = (event, selectedDate) => {
         setDate(selectedDate);
-        setFieldValue('tanggal_lahir', format(new Date(selectedDate), 'yyyy/MM/dd'));
+        setFieldValue('tanggal_lahir', format(new Date(selectedDate), 'yyyy-MM-dd'));
     };
 
     const showMode = (currentMode) => {
@@ -224,7 +225,7 @@ const EditGuru = ({navigation, route}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Edit Guru</Text>
+                <Text style={tw`text-center mr-5`}>Edit Guru</Text>
                 <View></View>
             </View>
 
@@ -266,8 +267,8 @@ const EditGuru = ({navigation, route}) => {
                             secureTextEntry={showPassword}
                             style={[tw`px-2`, customStyle.w80]}
                         />
-                        <View style={[styles.w10, tw`border-l border-gray-300 h-full`]}>
-                            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#0096FF" style={tw`px-2 py-4`} onPress={changeIconPassword} />
+                        <View style={[styles.w10]}>
+                            <Icon name={showPassword ? "eye-slash" : "eye"} size={15} color="#000000" style={tw`p-2`} onPress={changeIconPassword} />
                         </View>
                     </View>
                     {touched.password && errors.password &&
@@ -370,10 +371,10 @@ const EditGuru = ({navigation, route}) => {
                         onPress={() => onSelectBottomSheet("kelas")} 
                     >
                         <Text
-                            style={tw`w-4/5 px-2`}
+                            style={[tw`px-2`, customStyle.w90]}
                         >{selectArrKelasName && selectArrKelasName.length > 2 ? selectArrKelasName.toString() + '...' : selectArrKelasName}</Text>
-                        <View style={[styles.w10, tw`h-full`]}>
-                            <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
+                        <View style={[customStyle.w10]}>
+                            <Icon name="angle-down" size={15} color="#9e9e9e" style={tw`py-4`} />
                         </View>
                     </Pressable>
                     {arrKelas && arrKelas.length < 1 ? (
@@ -389,9 +390,9 @@ const EditGuru = ({navigation, route}) => {
                         style={tw`flex flex-row justify-between border border-gray-300 rounded-md items-center`}
                         onPress={() => onSelectBottomSheet("mapel")} 
                     >
-                        <Text style={tw`w-4/5 px-2`}>{selectMapelName}</Text>
-                        <View style={[styles.w10, tw`h-full`]}>
-                            <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
+                        <Text style={[tw`px-2`, customStyle.w90]}>{selectMapelName}</Text>
+                        <View style={[customStyle.w10]}>
+                            <Icon name="angle-down" size={15} color="#9e9e9e" style={tw`py-4`} />
                         </View>
                     </Pressable>
                     {touched.id_mapel && errors.id_mapel &&

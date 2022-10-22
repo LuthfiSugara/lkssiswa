@@ -96,6 +96,7 @@ const EditSiswa = ({navigation, route}) => {
         },
         onSubmit: values => {
             const formData = new FormData();
+            formData.append('id', userId);
             formData.append('nama', values.nama);
             formData.append('username', values.username);
             if(values.password != ''){
@@ -121,7 +122,7 @@ const EditSiswa = ({navigation, route}) => {
                 });
             }
             
-            dispatch(editProfileUser(userId, formData))
+            dispatch(editProfileUser(formData))
             .then(response => {
                 if(response.status === "success"){
                     navigation.goBack();
@@ -255,7 +256,7 @@ const EditSiswa = ({navigation, route}) => {
                             secureTextEntry={showPassword}
                             style={tw`w-4/5 px-2`}
                         />
-                        <Icon name={showPassword ? "eye-slash" : "eye"} size={15} color="#0096FF" style={tw`p-4`} onPress={changeIconPassword} />
+                        <Icon name={showPassword ? "eye-slash" : "eye"} size={15} color="#000000" style={tw`p-4`} onPress={changeIconPassword} />
                     </View>
                     {touched.password && errors.password &&
                         <Text style={tw`text-xs text-red-600`}>{errors.password}</Text>

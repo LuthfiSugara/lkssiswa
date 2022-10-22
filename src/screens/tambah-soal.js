@@ -9,6 +9,7 @@ import { baseUrl } from '../utils/global';
 import ImageView from "react-native-image-viewing";
 import { useIsFocused } from "@react-navigation/native";
 import RNFetchBlob from 'rn-fetch-blob';
+import Loader from '../components/loader';
 
 const TambahSoal = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -21,13 +22,12 @@ const TambahSoal = ({navigation, route}) => {
     const [previewVisible, setIsPreviewVisible] = useState(false);
     const [statusDownload, setStatusDownload] = useState(false);
 
-    const {loading, exam_pg, exam_essay} = useSelector((state) => state.examReducer);
+    const {load_exam, exam_pg, exam_essay} = useSelector((state) => state.examReducer);
 
     const loadData = async() => {
         await dispatch(getExamQuestionsPG(id, 1));
         await dispatch(getExamQuestionsEssay(id, 2));
     }
-    
 
     useEffect(() => {
         if(id_jenis_ujian == 1){
@@ -39,7 +39,7 @@ const TambahSoal = ({navigation, route}) => {
         }else{
             setSoalName("Kuis");
         }
-
+        console.log("test");
         loadData();
     }, [isFocused]);
 
@@ -142,13 +142,17 @@ const TambahSoal = ({navigation, route}) => {
         return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
     };
 
-    return (
+    console.log("load exam : ", load_exam);
+
+    return load_exam ? (
+        <Loader/>
+    ) : (
         <View style={tw`bg-white h-full`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={[customStyle.shadow, tw`py-2 px-4 rounded-full`]} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Soal {soalName}</Text>
+                <Text style={tw`text-center mr-5`}>Tambah Soal {soalName}</Text>
                 <Pressable onPress={() => {
                     Alert.alert(
                         "Selesai",
@@ -167,10 +171,10 @@ const TambahSoal = ({navigation, route}) => {
 
             <View style={tw`flex flex-row justify-between mt-4`}>
                 <Pressable onPress={() => setSoal("pg")} style={tw`p-4 w-1/2`}>
-                    <Text style={tw`w-full ${soal === "pg" ? "bg-blue-500" : "bg-gray-500"} p-2 rounded text-white text-center`}>Pilihan Ganda</Text>
+                    <Text style={tw`w-full ${soal === "pg" ? "bg-teal-500" : "bg-gray-500"} p-2 rounded text-white text-center`}>Pilihan Ganda</Text>
                 </Pressable>
                 <Pressable onPress={() => setSoal("essay")}  style={tw`p-4 w-1/2`}>
-                    <Text style={tw`w-full ${soal === "essay" ? "bg-blue-500" : "bg-gray-500"} p-2 rounded text-white text-center`}>Essay</Text>
+                    <Text style={tw`w-full ${soal === "essay" ? "bg-teal-500" : "bg-gray-500"} p-2 rounded text-white text-center`}>Essay</Text>
                 </Pressable>
             </View>
 
@@ -184,7 +188,7 @@ const TambahSoal = ({navigation, route}) => {
                                         <View style={tw`flex flex-row justify-between items-center mb-2`}>
                                             <Text style={[tw`mb-2`, customStyle.w85]}>{index + 1 + "."} {examPg.pertanyaan}</Text>
                                             <TouchableOpacity onPress={() => editSoal(examPg.id, 'pg')} style={[tw``, customStyle.w15]}>
-                                                <Text style={tw`bg-green-500 text-center text-white p-1 rounded`}>edit</Text>
+                                                <Text style={tw`bg-teal-500 text-center text-white p-1 rounded`}>edit</Text>
                                             </TouchableOpacity>
                                         </View>
                                         <ImageView
@@ -229,19 +233,19 @@ const TambahSoal = ({navigation, route}) => {
                                         }
                                         <View style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}>
                                             <Text>a. {examPg.pilihan_a}</Text>
-                                            {examPg.jawaban === "a" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                            {examPg.jawaban === "a" && <Icon name={'check'} size={15} color="#14b8a6" style={tw``} /> }
                                         </View>
                                         <View style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}>
                                             <Text>b. {examPg.pilihan_b}</Text>
-                                            {examPg.jawaban === "b" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                            {examPg.jawaban === "b" && <Icon name={'check'} size={15} color="#14b8a6" style={tw``} /> }
                                         </View>
                                         <View style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}>
                                             <Text>c. {examPg.pilihan_c}</Text>
-                                            {examPg.jawaban === "c" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                            {examPg.jawaban === "c" && <Icon name={'check'} size={15} color="#14b8a6" style={tw``} /> }
                                         </View>
                                         <View style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}>
                                             <Text>d. {examPg.pilihan_d}</Text>
-                                            {examPg.jawaban === "d" && <Icon name={'check'} size={15} color="#2196f3" style={tw``} /> }
+                                            {examPg.jawaban === "d" && <Icon name={'check'} size={15} color="#14b8a6" style={tw``} /> }
                                         </View>
                                     </View>
                                 )
@@ -255,7 +259,7 @@ const TambahSoal = ({navigation, route}) => {
                                         <View style={tw`flex flex-row`}>
                                             <Text style={[tw`my-2`, customStyle.w85]}>{index + 1 + "."} {essay.pertanyaan}</Text>
                                             <TouchableOpacity onPress={() => editSoal(essay.id, 'essay')} style={[tw``, customStyle.w15]}>
-                                                <Text style={tw`bg-green-500 text-center text-white p-1 rounded`}>edit</Text>
+                                                <Text style={tw`bg-teal-500 text-center text-white p-1 rounded`}>edit</Text>
                                             </TouchableOpacity>
                                         </View>
                                         <ImageView
@@ -310,11 +314,11 @@ const TambahSoal = ({navigation, route}) => {
             </ScrollView>
             <View style={tw`m-4`}>
                 {soal === "pg" ? (
-                    <TouchableOpacity onPress={() => navigation.navigate('TambahSoalPG', {id_ujian: id})} style={tw`w-full bg-blue-500 py-2 px-5 rounded `}>
+                    <TouchableOpacity onPress={() => navigation.navigate('TambahSoalPG', {id_ujian: id})} style={tw`w-full bg-teal-500 py-2 px-5 rounded `}>
                         <Text style={tw`text-white text-center`}>Tambah Soal Pilihan Ganda</Text>
                     </TouchableOpacity>
                 ) : (
-                    <TouchableOpacity onPress={() => navigation.navigate('TambahSoalEssay', {id_ujian: id})} style={tw`w-full bg-blue-500 py-2 px-5 rounded `}>
+                    <TouchableOpacity onPress={() => navigation.navigate('TambahSoalEssay', {id_ujian: id})} style={tw`w-full bg-teal-500 py-2 px-5 rounded `}>
                         <Text style={tw`text-white text-center`}>Tambah Soal Essay</Text>
                     </TouchableOpacity>
                 )}

@@ -35,74 +35,74 @@ const examReducer = (state = initialState, action) => {
         case GETDETAILEXAM:
             return {
                 ...state,
-                load_exam: false,
-                detail_exam: action.payload
+                load_exam: action.payload.loading,
+                detail_exam: action.payload.data
             }
         case GETEXAMQUESTIONSPG:
             return {
                 ...state,
-                load_exam: false,
-                exam_pg: action.payload
+                load_exam: action.payload.loading,
+                exam_pg: action.payload.data
             }
         case GETEXAMQUESTIONSESSAY:
             return {
                 ...state,
-                load_exam: false,
-                exam_essay: action.payload
+                load_exam: action.payload.loading,
+                exam_essay: action.payload.data
             }
         case GETEXAMBASEONTYPE:
             return {
                 ...state,
-                load_exam: false,
-                exam_base_on_type: action.payload
+                load_exam: action.payload.loading,
+                exam_base_on_type: action.payload.data
             }
         case GETDETAILQUESTION:
             return {
                 ...state,
-                load_exam: false,
-                detail_question: action.payload
+                load_exam: action.payload.loading,
+                detail_question: action.payload.data
             }
         case GETEXAMRESULTS:
             return {
                 ...state,
-                load_exam: false,
-                exam_results: action.payload
+                load_exam: action.payload.loading,
+                exam_results: action.payload.data
             }
         case GETEXAMRESULTSANSWER:
             return {
                 ...state,
-                load_exam: false,
-                exam_results_answer: action.payload
+                load_exam: action.payload.loading,
+                exam_results_answer: action.payload.data
             }
         case GETSTUDENTSCORE:
             return {
                 ...state,
-                load_exam: false,
-                student_score: action.payload
+                load_exam: action.payload.loading,
+                student_score: action.payload.data
             }
         case GET_STUDENT_SCORE_DETAIL:
             return {
                 ...state,
-                load_exam: false,
-                student_score_detail: action.payload
+                load_exam: action.payload.loading,
+                student_score_detail: action.payload.data
             }
         case CORRECT_STUDENT_ANSWER:
             return {
                 ...state,
-                load_exam: false,
-                correct_student_answer: action.payload
+                load_exam: action.payload.loading,
+                correct_student_answer: action.payload.data
             }
         case DETAIL_SCORE:
             return {
                 ...state,
-                load_exam: false,
-                detail_score: action.payload
+                load_exam: action.payload.loading,
+                detail_score: action.payload.data
             }
         case DETAIL_ANSWER:
             return {
                 ...state,
-                load_exam: false,
-                detail_answer: action.payload
+                load_exam: action.payload.loading,
+                detail_answer: action.payload.data
             }
         default: 
             return state;

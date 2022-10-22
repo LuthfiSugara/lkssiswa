@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getProfile, signOut } from '../redux/actions/auth-actions';
@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dataKelas, dataMapel } from '../redux/actions/setting-actions';
+import { customStyle } from '../utils/style';
 
 
 const Nilai = ({navigation}) => {
@@ -37,11 +38,18 @@ const Nilai = ({navigation}) => {
           }}>
               <Icon name={'angle-left'} size={25} color="#000000" />
           </Pressable>
-          <Text style={tw`text-center text-lg mr-5`}>Nilai</Text>
+          <Text style={tw`text-center mr-5`}>Nilai</Text>
           <View></View>
       </View>
 
       <ScrollView style={tw`mt-4`}>
+        <View style={tw`flex flex-row items-center bg-teal-500 mx-4 rounded-lg my-5`}>
+          <Image
+            style={[tw`rounded-lg w-40 h-40 m-4`, customStyle.aspectSquare, customStyle.w20]}
+            source={require('../assets/images/exam.jpg')}
+          />
+            <Text style={[tw`text-white`, customStyle.w80]}>Kelola data nilai siswa</Text>
+        </View>
         <View style={tw`flex flex-row flex-wrap justify-center`}>
           {step == 1 ? (
             data_kelas.map((kelas, index) => {
@@ -54,7 +62,7 @@ const Nilai = ({navigation}) => {
                   }}
                   style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
                 >
-                  <Icon name={'users'} size={30} color="#0096FF" />
+                  <Icon name={'users'} size={30} color="#14b8a6" />
                   <Text style={tw`text-lg font-semibold text-black`}>{kelas.name}</Text>
                 </TouchableOpacity>
               )
@@ -70,7 +78,7 @@ const Nilai = ({navigation}) => {
                   })}
                   style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
                 >
-                  <Icon name={'users'} size={30} color="#0096FF" />
+                  <Icon name={'users'} size={30} color="#14b8a6" />
                   <Text style={tw`text-lg font-semibold text-black`}>{kelas.name}</Text>
                 </TouchableOpacity>
               )

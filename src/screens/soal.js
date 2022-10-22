@@ -6,12 +6,13 @@ import { customStyle } from '../utils/style';
 import { useDispatch, useSelector } from "react-redux";
 import { dataKelas, dataMapel } from '../redux/actions/setting-actions';
 import {Picker} from '@react-native-picker/picker';
-import { getTeacherById } from '../redux/actions/auth-actions';
+import { getProfile, getTeacherById } from '../redux/actions/auth-actions';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { createExam } from '../redux/actions/exam-actions';
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
+import Loader from '../components/loader';
 
 const Soal = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -21,12 +22,12 @@ const Soal = ({navigation, route}) => {
     const [step, setStep] = useState(1);
 
 
-    const {loading, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
-    const {teacher_by_id} = useSelector((state) => state.userReducer);
+    const {load_setting, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
+    const {load_auth, teacher_by_id, profile} = useSelector((state) => state.userReducer);
 
-    const [idMapel, setIdMapel] = useState(data_mapel.length > 0 ? data_mapel[0].id : "");
-    const [idKelas, setIdKelas] = useState(data_kelas.length > 0 ? data_kelas[0].id : "");
-    const [idGuru, setIdGuru] = useState(teacher_by_id.length > 0 ? teacher_by_id[0].id_user : "");
+    const [idMapel, setIdMapel] = useState("");
+    const [idKelas, setIdKelas] = useState("");
+    const [idGuru, setIdGuru] = useState("");
     const [dateFrom, setDateFrom] = useState(new Date(format(new Date(), 'yyyy'), format(new Date(), 'M') - 1, format(new Date(), 'd')));
     const [dateTo, setDateTo] = useState(new Date(format(new Date(), 'yyyy'), format(new Date(), 'M') - 1, format(new Date(), 'd')));
     const [timeFrom, setTimeFrom] = useState(new Date());
@@ -35,6 +36,11 @@ const Soal = ({navigation, route}) => {
     const loadData = async() => {
         await dispatch(dataMapel());
         await dispatch(dataKelas());
+        await dispatch(getProfile());
+    }
+
+    const loadTeacher = async() => {
+        await dispatch(getTeacherById(idKelas, idMapel));
     }
 
     useEffect(() => {
@@ -52,20 +58,11 @@ const Soal = ({navigation, route}) => {
         loadTeacher();
     }, []);
 
-    const loadTeacher = async() => {
-        await dispatch(getTeacherById(idKelas, idMapel));
-    }
     useEffect(() => {
         if(idMapel != "" && idKelas != ""){
             loadTeacher();
         }
     }, [idMapel, idKelas]);
-
-    useEffect(() => {
-        if(teacher_by_id.length > 0){
-            setIdGuru(teacher_by_id[0].id_user);
-        }
-    }, [teacher_by_id]);
 
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
@@ -123,6 +120,23 @@ const Soal = ({navigation, route}) => {
         }),
     });
 
+    useEffect(() => {
+        if(data_mapel.length > 0){
+            setIdMapel(data_mapel[0].id);
+            setFieldValue('id_mapel', data_mapel[0].id);
+        }
+
+        if(data_kelas.length > 0){
+            setIdKelas(data_kelas[0].id);
+            setFieldValue('id_kelas', data_kelas[0].id);
+        }
+
+        if(teacher_by_id.length > 0){
+            setIdGuru(teacher_by_id[0].id_user);
+            setFieldValue('id_guru', teacher_by_id[0].id_user);
+        }
+    }, [data_mapel, data_kelas, teacher_by_id]);
+
     const onChangeDateFrom = (event, selectedDate) => {
         setDateFrom(selectedDate);
         setFieldValue('from', format(new Date(selectedDate), 'yyyy/MM/dd'));
@@ -179,13 +193,15 @@ const Soal = ({navigation, route}) => {
         showMode(mode, name);
     };
 
-    return (
+    return load_setting && load_auth ? (
+        <Loader/>
+    ) : (
         <View style={tw`bg-white h-full`}>
             <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Soal {soalName}</Text>
+                <Text style={tw`text-center mr-5`}>{soalName}</Text>
                 <View></View>
             </View>
 
@@ -194,28 +210,33 @@ const Soal = ({navigation, route}) => {
                     <View style={tw`flex flex-row flex-wrap justify-center`}>
                         <TouchableOpacity
                             onPress={() => navigation.navigate('ListSoal', {type: id_soal})} 
-                            style={[customStyle.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+                            style={[tw`w-full flex flex-row justify-between p-3 m-2 border border-gray-300 rounded`]}
                         >
-                            <Icon name={'file-signature'} size={30} color="#0096FF" />
-                            <Text style={tw`text-lg font-semibold text-black`}>Soal</Text>
+                            <Text style={tw`text-black`}>Daftar Soal</Text>
+                            <Icon name={'angle-right'} size={20} color="#000000" />
                         </TouchableOpacity>
 
-                        <TouchableOpacity
-                            onPress={() => setStep(2)}
-                            style={[customStyle.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-                        >
-                            <Icon name={'file-signature'} size={30} color="#0096FF" />
-                            <Text style={tw`text-lg font-semibold text-black`}>Tambah Soal</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Exam', {
-                                type: id_soal
-                            })} 
-                            style={[customStyle.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
-                        >
-                            <Icon name={'file-signature'} size={30} color="#0096FF" />
-                            <Text style={tw`text-lg font-semibold text-black`}>Kerjakan Soal</Text>
-                        </TouchableOpacity>
+                        {profile.id_jabatan != 3 ? (
+                            <TouchableOpacity
+                                onPress={() => setStep(2)} 
+                                style={[tw`w-full flex flex-row justify-between p-3 m-2 border border-gray-300 rounded`]}
+                            >
+                                <Text style={tw`text-black`}>Tambah Soal</Text>
+                                <Icon name={'angle-right'} size={20} color="#000000" />
+                            </TouchableOpacity>
+                        ) : null}
+                        
+                        {profile.id_jabatan == 3 ? (
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Exam', {
+                                    type: id_soal
+                                })} 
+                                style={[tw`w-full flex flex-row justify-between p-3 m-2 border border-gray-300 rounded`]}
+                            >
+                                <Text style={tw`text-black`}>Soal {soalName}</Text>
+                                <Icon name={'angle-right'} size={20} color="#000000" />
+                            </TouchableOpacity>
+                        ) : null}
                     </View>
                 ) : (
                     <View style={tw`px-4 my-8`}>
@@ -322,7 +343,7 @@ const Soal = ({navigation, route}) => {
 
                         {teacher_by_id.length < 1 || idKelas == "" || idMapel == "" ? (
                             <TouchableOpacity style={tw`bg-gray-500 py-2 rounded-lg mt-4`}>
-                                <Text style={tw`text-white text-center text-lg`}>Lanjut</Text>
+                                <Text style={tw`text-white text-center`}>Lanjut</Text>
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity onPress={() => {
@@ -336,8 +357,8 @@ const Soal = ({navigation, route}) => {
                                         }}
                                     ]
                                 );
-                            }} style={tw`bg-blue-500 py-2 rounded-lg mt-4`}>
-                                <Text style={tw`text-white text-center text-lg`}>Buat Ujian</Text>
+                            }} style={tw`bg-teal-500 py-2 rounded-lg mt-4`}>
+                                <Text style={tw`text-white text-center`}>Buat Ujian</Text>
                             </TouchableOpacity>
                         )} 
                     </View>

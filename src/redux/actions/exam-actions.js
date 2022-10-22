@@ -17,6 +17,7 @@ import {
     DETAIL_ANSWER,
     UPDATE_STUDENT_SCORE,
     UPDATE_DETAIL_ANSWER,
+    CREATEEXAM,
 } from "../types/exam";
 import { ToastAndroid } from "react-native";
 import { UseGetAction } from "../../utils/use-get-action";
@@ -36,55 +37,14 @@ export const getStudentScoreDetail = (id_ujian) =>
         {id_ujian : id_ujian},
     );
 
-export const createExam = (request) => async (dispatch) => {
-    try{
-        let token = "";
-        await AsyncStorage.getItem('userData')
-        .then(value => {
-            if(value != null){
-                let data = JSON.parse(value);
-                token = data.access_token;
-            }
-        });
-
-        const req = axios.post(
-            `${baseUrl}/api/create-exam`, 
-            request,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }
-        ).then(function(response){
-            if(response.data.status === "success"){
-                ToastAndroid.showWithGravityAndOffset(
-                    response.data.message,
-                    ToastAndroid.LONG,
-                    ToastAndroid.TOP,
-                    25,
-                    50
-                );
-            }else{
-                ToastAndroid.showWithGravityAndOffset(
-                    response.data.message,
-                    ToastAndroid.LONG,
-                    ToastAndroid.TOP,
-                    25,
-                    50
-                );
-            }
-            
-            return response.data;
-        }).catch(function(error){
-            console.log(error);
-        });
-
-        return req;
-    }catch(error){
-        console.log(error);
-    }
-}
+export const createExam = (data) => 
+    UsePostAction(
+        'create-exam',
+        CREATEEXAM,
+        undefined,
+        data,
+        false,
+    );
 
 export const getDetailExam = (id) => 
     UseGetAction(
@@ -193,104 +153,27 @@ export const createExamQuestions = (request) => async (dispatch) => {
     }
 }
 
-export const getExamQuestionsPG = (idExam, type) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/get-exam-questions/${idExam}/${type}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETEXAMQUESTIONSPG,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getExamQuestionsPG = (id, type) =>
+    UseGetAction(
+        'get-exam-questions',
+        GETEXAMQUESTIONSPG,
+        {id: id, type: type}
+    );
 
-export const getExamQuestionsEssay = (idExam, type) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/get-exam-questions/${idExam}/${type}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETEXAMQUESTIONSESSAY,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getExamQuestionsEssay = (id, type) => 
+    UseGetAction(
+        'get-exam-questions',
+        GETEXAMQUESTIONSESSAY,
+        {id: id, type: type}
+    );
 
-export const getExamBaseOnType = (type, idMapel, idKelas, idGuru) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/get-all-exam-base-on-type/${type}/${idMapel}/${idKelas}/${idGuru}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETEXAMBASEONTYPE,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getExamBaseOnType = (type, id_mapel, id_kelas, id_guru) => 
+    UseGetAction(
+        'get-all-exam-base-on-type',
+        GETEXAMBASEONTYPE,
+        {type: type, id_mapel: id_mapel, id_kelas: id_kelas, id_guru: id_guru}
+
+    );
 
 export const deleteExam = (id) => async (dispatch) => {
     try{
@@ -342,38 +225,12 @@ export const deleteExam = (id) => async (dispatch) => {
     }
 }
 
-export const getDetailQuestion = (id) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/detail-question/${id}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETDETAILQUESTION,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getDetailQuestion = (id) => 
+    UseGetAction(
+        'detail-question',
+        GETDETAILQUESTION,
+        {id: id}
+    );
 
 export const deleteFileExam = (id) => async (dispatch) => {
     try{
@@ -558,38 +415,12 @@ export const getExamResults = (idUjian, idSiswa) => {
     }
 }
 
-export const getExamResultsAnswer = (id_siswa, id_ujian, id_soal) => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/get-exam-results-answer/${id_siswa}/${id_ujian}/${id_soal}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETEXAMRESULTSANSWER,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getExamResultsAnswer = (id_siswa, id_ujian, id_soal) => 
+    UseGetAction(
+        'get-exam-results-answer',
+        GETEXAMRESULTSANSWER,
+        {id_siswa: id_siswa, id_ujian: id_ujian, id_soal: id_soal}
+    );
 
 export const updateExamResultsAnswer = (request, id_siswa, id_ujian, id_soal) => async (dispatch) => {
     try{
@@ -718,4 +549,5 @@ export const updateStudentScore = (data) =>
         UPDATE_STUDENT_SCORE, 
         undefined,
         data,
+        false,
     );

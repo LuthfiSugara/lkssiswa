@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { customStyle } from '../utils/style';
 
 
 const LKS = ({navigation}) => {
@@ -18,37 +19,59 @@ const LKS = ({navigation}) => {
           <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
               <Icon name={'angle-left'} size={25} color="#000000" />
           </Pressable>
-          <Text style={tw`text-center text-lg mr-5`}>Ujian</Text>
+          <Text style={tw`text-center mr-5`}>E-LKS</Text>
           <View></View>
       </View>
 
       <ScrollView style={tw`h-full p-4 bg-white`}>
-        <View style={tw`flex flex-row flex-wrap justify-center`}>
+        <View style={tw`flex flex-row items-center bg-teal-500 mx-4 rounded-lg my-5`}>
+          <Image
+            style={[tw`rounded-lg w-40 h-40 m-4`, customStyle.aspectSquare, customStyle.w20]}
+            source={require('../assets/images/exam.jpg')}
+          />
+            <Text style={[tw`text-white`, customStyle.w80]}>E-LKS</Text>
+        </View>
+        <View style={tw`flex flex-row flex-wrap justify-around`}>
           <TouchableOpacity
-            onPress={() => redirectToCreateSoal(1)} 
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}
+              onPress={() => {redirectToCreateSoal(1)}}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+            >
+            <Image
+              style={[tw`rounded-lg w-20 h-20 m-4`, customStyle.aspectSquare]}
+              source={require('../assets/images/exam.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>Ulangan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              onPress={() => {redirectToCreateSoal(2)}}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+            >
+            <Image
+              style={[tw`rounded-lg w-20 h-20 m-4`, customStyle.aspectSquare]}
+              source={require('../assets/images/training.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>Latihan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              onPress={() => {redirectToCreateSoal(3)}}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+            >
+            <Image
+              style={[tw`rounded-lg w-20 h-20 m-4`, customStyle.aspectSquare]}
+              source={require('../assets/images/work.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>Tugas</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              onPress={() => {redirectToCreateSoal(4)}}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
           >
-              <Icon name={'file-signature'} size={30} color="#0096FF" />
-              <Text style={tw`text-lg font-semibold text-black`}>Ulangan</Text>
+            <Image
+              style={[tw`rounded-lg w-20 h-20 m-4`, customStyle.aspectSquare]}
+              source={require('../assets/images/quiz.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>Kuis</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => redirectToCreateSoal(2)} 
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-              <Icon name={'shapes'} size={30} color="#0096FF" />
-              <Text style={tw`text-lg font-semibold text-black`}>Latihan</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => redirectToCreateSoal(3)} 
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-              <Icon name={'superscript'} size={30} color="#0096FF" />
-              <Text style={tw`text-lg font-semibold text-black`}>Tugas</Text>
-            </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => redirectToCreateSoal(4)} 
-            style={[styles.shadow, tw`w-2/5 px-4 py-8 m-2 items-center rounded-xl`]}>
-              <Icon name={'pencil-ruler'} size={30} color="#0096FF" />
-              <Text style={tw`text-lg font-semibold text-black`}>Kuis</Text>
-            </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

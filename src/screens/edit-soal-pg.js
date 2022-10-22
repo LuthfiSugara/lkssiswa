@@ -11,6 +11,7 @@ import DocumentPicker from "react-native-document-picker";
 import { useIsFocused } from "@react-navigation/native";
 import { baseUrl } from '../utils/global';
 import { isImage } from '../utils/function';
+import Loader from '../components/loader';
 
 const EditSoalPG = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -19,8 +20,9 @@ const EditSoalPG = ({navigation, route}) => {
 
     const [fileSoal, setFileSoal] = useState([]);
     const [loadPage, setLoadPage] = useState(false);
+    const [detail, setDetail] = useState([]);
 
-    const {detail_question} = useSelector((state) => state.examReducer);
+    const {load_exam, detail_question} = useSelector((state) => state.examReducer);
 
     const loadData = async() => {
         await dispatch(getDetailQuestion(id));
@@ -32,12 +34,12 @@ const EditSoalPG = ({navigation, route}) => {
 
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
-            pertanyaan: detail_question.pertanyaan,
-            pilihan_a: detail_question.pilihan_a,
-            pilihan_b: detail_question.pilihan_b,
-            pilihan_c: detail_question.pilihan_a,
-            pilihan_d: detail_question.pilihan_a,
-            jawaban: detail_question.jawaban,
+            pertanyaan: '',
+            pilihan_a: '',
+            pilihan_b: '',
+            pilihan_c: '',
+            pilihan_d: '',
+            jawaban: '',
         },
         onSubmit: values => {
             const formData = new FormData();
@@ -87,13 +89,19 @@ const EditSoalPG = ({navigation, route}) => {
         }),
     });
 
+    console.log("load : ", load_exam);
+    console.log("detail : ", detail_question);
+
     useEffect(() => {
-        values.pertanyaan = detail_question.pertanyaan;
-        values.pilihan_a = detail_question.pilihan_a;
-        values.pilihan_b = detail_question.pilihan_b;
-        values.pilihan_c = detail_question.pilihan_c;
-        values.pilihan_d = detail_question.pilihan_d;
-        values.jawaban = detail_question.jawaban;
+        if(detail_question.length > 0){
+            setFieldValue('pertanyaan', detail_question[0].pertanyaan);
+            setFieldValue('pilihan_a', detail_question[0].pilihan_a);
+            setFieldValue('pilihan_b', detail_question[0].pilihan_b);
+            setFieldValue('pilihan_c', detail_question[0].pilihan_c);
+            setFieldValue('pilihan_d', detail_question[0].pilihan_d);
+            setFieldValue('jawaban', detail_question[0].jawaban);
+            setDetail(detail_question[0].detail);
+        }
     }, [detail_question]);
 
     const handleDocumentSelection = useCallback(async () => {
@@ -118,11 +126,8 @@ const EditSoalPG = ({navigation, route}) => {
         })
     }
 
-    return loadPage ? (
-        <View style={tw`flex flex-1 justify-center items-center`}>
-            <ActivityIndicator size="large" color="#ff1402" />
-            <Text style='text-center'>Loading....</Text>
-        </View>
+    return load_exam ? (
+        <Loader/>
     ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
@@ -153,7 +158,7 @@ const EditSoalPG = ({navigation, route}) => {
                         }
                     </View>
                     <View style={tw`mb-4`}>
-                        <View style={tw`flex flex-row justify-between items-end`}>
+                        <View style={tw`flex flex-row justify-between`}>
                             <Text style={[tw`text-lg`, customStyle.w5]}>a.</Text>
                             <TextInput
                                 value={values.pilihan_a}
@@ -161,7 +166,7 @@ const EditSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "a" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "a")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -182,7 +187,7 @@ const EditSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "b" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "b")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -203,7 +208,7 @@ const EditSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "c" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "c")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -224,7 +229,7 @@ const EditSoalPG = ({navigation, route}) => {
                                 style={[tw`border-b border-gray-400 rounded-md pb-0`, customStyle.w90]}
                             />
                             {values.jawaban == "d" ? (
-                                <Icon name={'check'} size={15} color="#2196f3" style={[tw`text-center`, customStyle.w5]} />
+                                <Icon name={'check'} size={15} color="#14b8a6" style={[tw`text-center`, customStyle.w5]} />
                             ) : (
                                 <TouchableOpacity onPress={() => setFieldValue("jawaban", "d")} style={customStyle.w5}>
                                     <Icon name={'check'} size={15} color="#9e9e9e" style={tw`text-center`} />
@@ -238,7 +243,7 @@ const EditSoalPG = ({navigation, route}) => {
 
                     <ScrollView horizontal={true}>
                         <View style={tw`flex flex-row justify-start mb-2 mt-4 w-full h-30`}>
-                            {detail_question.detail.map((detail, index) => {
+                            {detail.map((detail, index) => {
                                 return (
                                     isImage(detail.name) ? (
                                         <View key={index} style={tw`px-2`}>
@@ -306,7 +311,7 @@ const EditSoalPG = ({navigation, route}) => {
                     <TouchableOpacity onPress={() => {
                         handleSubmit();
                         setLoadPage(true);
-                    }} style={tw`w-full bg-blue-500 rounded p-2 mt-6`}>
+                    }} style={tw`w-full bg-teal-500 rounded p-2 my-6`}>
                         <Text style={tw`text-white text-center`}>Simpan</Text>
                     </TouchableOpacity>
                 </View>

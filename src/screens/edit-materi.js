@@ -14,6 +14,7 @@ import DocumentPicker from "react-native-document-picker";
 import { customStyle } from '../utils/style';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
+import Loader from '../components/loader';
 
 const EditMateri = ({navigation, route}) => {
     const {id} = route.params;
@@ -22,7 +23,7 @@ const EditMateri = ({navigation, route}) => {
     const [fileMateri, setFileMateri] = useState([]);
     const [loadBtn, setLoadBtn] = useState(false);
 
-    const {loading, detail_materi} = useSelector((state) => state.materiReducer);
+    const {load_materi, detail_materi} = useSelector((state) => state.materiReducer);
 
     const loadData = async() => {
         await dispatch(getDetailMateri(id));
@@ -90,13 +91,15 @@ const EditMateri = ({navigation, route}) => {
         })
     }
 
-    return (
+    return load_materi ? (
+        <Loader />
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`py-2 px-4 rounded-full shadow bg-white`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Edit Materi</Text>
+                <Text style={tw`text-center mr-5`}>Edit Materi</Text>
                 <View></View>
             </View>
 
@@ -116,7 +119,7 @@ const EditMateri = ({navigation, route}) => {
 
                     <View style={tw`mb-4`}>
                         <Text style={tw`mb-2 text-gray-800`}>Materi</Text>
-                        {detail_materi?.detail.map((detail, index) => {
+                        {detail_materi.detail.map((detail, index) => {
                             return (
                                 <TouchableOpacity 
                                     key={index} 
@@ -195,7 +198,7 @@ const EditMateri = ({navigation, route}) => {
             </ScrollView>
             <View style={tw`m-4`}>
                 {loadBtn ? (
-                    <TouchableOpacity style={tw`w-full bg-blue-500 p-2 rounded`}>
+                    <TouchableOpacity style={tw`w-full bg-teal-500 p-2 rounded`}>
                         <ActivityIndicator color={"#ffffff"} />
                     </TouchableOpacity>
 
@@ -203,8 +206,8 @@ const EditMateri = ({navigation, route}) => {
                     <TouchableOpacity onPress={() => {
                         handleSubmit();
                         setLoadBtn(true);
-                    }} style={tw`w-full bg-blue-500 p-2 rounded`}>
-                        <Text style={tw`text-center text-white text-lg`}>Simpan</Text>
+                    }} style={tw`w-full bg-teal-500 p-2 rounded`}>
+                        <Text style={tw`text-center text-white`}>Simpan</Text>
                     </TouchableOpacity>
                 )}
             </View>

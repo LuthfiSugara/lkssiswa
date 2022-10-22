@@ -11,8 +11,8 @@ const mapelReducer = (state = initialState, action) => {
         case DETAILMAPEL:
             return {
                 ...state,
-                loading: false,
-                detail_mapel: action.payload
+                loading: action.payload.loading,
+                detail_mapel: action.payload.data
             }
         default: 
             return state;
