@@ -9,6 +9,8 @@ import { WebView } from 'react-native-webview';
 import RNFetchBlob from 'rn-fetch-blob';
 import { baseUrl } from '../utils/global';
 import { useIsFocused } from "@react-navigation/native";
+import Loader from '../components/loader';
+import { getProfile } from '../redux/actions/auth-actions';
 
 const DetailMateri = ({navigation, route}) => {
     const {id, mapel_name, schedule} = route.params;
@@ -18,15 +20,19 @@ const DetailMateri = ({navigation, route}) => {
     const dispatch = useDispatch();
     const [fileUrl, setFileUrl] = useState(baseUrl + "/assets/images/example.png");
 
-    const {loading, detail_materi} = useSelector((state) => state.materiReducer);
+    const {load_materi, detail_materi} = useSelector((state) => state.materiReducer);
+    const {load_auth, profile} = useSelector((state) => state.userReducer);
 
     const loadData = async() => {
         await dispatch(getDetailMateri(id));
+        await dispatch(getProfile());
     }
     
     useEffect(() => {
         loadData();
     }, [isFocused]);
+
+    console.log("profile : ", profile);
 
     const checkPermission = async () => {
         
@@ -91,23 +97,26 @@ const DetailMateri = ({navigation, route}) => {
         return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
     };
 
-    return (
+    return load_materi && load_auth ? (
+        <Loader />
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`py-2 px-4 rounded-full shadow bg-white`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>{mapel_name + ' - ' + schedule}</Text>
+                <Text style={tw`text-center mr-5`}>{mapel_name + ' - ' + detail_materi.judul}</Text>
                 <View></View>
             </View>
             <ScrollView style={tw`h-full`}>
                 <View style={tw`mt-4 px-4`}>
-                    <View style={tw`flex flex-row justify-between items-center mb-4`}>
-                        <Text style={tw`text-lg mb-4`}>{detail_materi.judul}</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('EditMateri', { id: id})} style={tw`bg-green-500 rounded`}>
-                            <Text style={tw`text-white p-2`}>Update</Text>
-                        </TouchableOpacity>
-                    </View>
+                    {profile.id_jabatan != 3 ? (
+                        <View style={tw`flex flex-row justify-end items-center mb-8`}>
+                            <TouchableOpacity onPress={() => navigation.navigate('EditMateri', { id: id})} style={tw`bg-teal-500 rounded`}>
+                                <Text style={tw`text-white p-2`}>Update</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : null}
                     {detail_materi?.detail?.map((detail, index) => {
                         return (
                             <View key={index} style={tw`flex flex-row justify-between mb-2 pb-1 border-b border-gray-300`}>
@@ -121,8 +130,8 @@ const DetailMateri = ({navigation, route}) => {
                             </View>
                         )
                     })}
-                    <View style={tw`h-96`}>
-                        <Text style={tw`text-lg`}>Keterangan</Text>
+                    <View style={tw`h-96 my-4`}>
+                        <Text style={tw`text-sm`}>Keterangan</Text>
                         <WebView 
                             originWhitelist={['*']}
                             source={{ html: `<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body>${detail_materi.keterangan}</body></html>` }}

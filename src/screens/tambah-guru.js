@@ -354,10 +354,10 @@ const TambahGuru = ({navigation, route}) => {
                         onPress={() => onSelectBottomSheet("kelas")} 
                     >
                         <Text
-                            style={tw`w-4/5 px-2`}
+                            style={[customStyle.w80, tw`px-2`]}
                         >{selectArrKelasName.length > 2 ? selectArrKelasName.toString() + '...' : selectArrKelasName.toString()}</Text>
-                        <View style={[styles.w10, tw`h-full`]}>
-                            <Icon name="angle-down" size={20} color="#9e9e9e" style={tw`p-4`} />
+                        <View style={[styles.w20, tw`h-full`]}>
+                            <Icon name="angle-down" size={15} color="#9e9e9e" style={tw`p-4`} />
                         </View>
                     </Pressable>
                     {arrKelas.length < 1 &&

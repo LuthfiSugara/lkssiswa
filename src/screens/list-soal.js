@@ -7,25 +7,29 @@ import { deleteExam, getExamBaseOnType } from '../redux/actions/exam-actions';
 import { customStyle } from '../utils/style';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { dataKelas, dataMapel } from '../redux/actions/setting-actions';
-import { getAllGuru } from '../redux/actions/auth-actions';
+import { getAllGuru, getProfile } from '../redux/actions/auth-actions';
 import {Picker} from '@react-native-picker/picker';
+import Loader from '../components/loader';
+import NotFound from '../components/not-found';
+import { useIsFocused } from "@react-navigation/native";
 
 const ListSoal = ({navigation, route}) => {
     const dispatch = useDispatch();
     const {type} = route.params;
     const refRBSheet = useRef();
-    var {width} = Dimensions.get('window');
+    const isFocused = useIsFocused();
 
     const [soalName, setSoalName] = useState("");
     const [idMapel, setIdMapel] = useState("All");
     const [idKelas, setIdKelas] = useState("All");
     const [idGuru, setIdGuru] = useState("All");
 
-    const {loading, exam_base_on_type} = useSelector((state) => state.examReducer);
-    const {data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
-    const {list_guru} = useSelector((state) => state.userReducer);
+    const {load_exam, exam_base_on_type} = useSelector((state) => state.examReducer);
+    const {load_setting, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
+    const {load_auth, list_guru, profile} = useSelector((state) => state.userReducer);
 
     const loadData = async() => {
+        await dispatch(getProfile());
         await dispatch(dataMapel());
         await dispatch(dataKelas());
         await dispatch(getAllGuru());
@@ -48,7 +52,7 @@ const ListSoal = ({navigation, route}) => {
 
         loadData();
         loadExam();
-    }, []);
+    }, [isFocused]);
 
     const openFilter = () => {
         refRBSheet.current.open();
@@ -58,7 +62,7 @@ const ListSoal = ({navigation, route}) => {
         setIdMapel("All");
         setIdKelas("All");
         setIdGuru("All");
-        dispatch(getExamBaseOnType(type, idMapel, idKelas, idGuru));
+        dispatch(getExamBaseOnType(type, "All", "All", "All"));
         refRBSheet.current.close();
     }
 
@@ -75,62 +79,67 @@ const ListSoal = ({navigation, route}) => {
             }
         })
         .catch(err => console.log(err));
-        console.log("delete : ", id);
     }
 
-    return (
+    return load_exam && load_setting && load_auth ? (
+        <Loader/>
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Soal {soalName}</Text>
-                <View></View>
+                <Text style={tw`text-center mr-5`}>{soalName}</Text>
+                <TouchableOpacity onPress={openFilter} style={tw` px-2`}>
+                    <Icon name={'filter'} size={20} color="#000000" />
+                </TouchableOpacity>
             </View>
 
-            <TouchableOpacity onPress={openFilter} style={tw``}>
-                <Text style={tw`text-right text-blue-500 px-4`}>Filter</Text>
-            </TouchableOpacity>
-
-            <ScrollView style={tw`h-full p-4 bg-white`}>
-                <View style={tw`flex flex-row flex-wrap justify-center`}>
-                    {exam_base_on_type.length > 0 ? (
-                        exam_base_on_type.map((exam, index) => {
-                            return (
-                                <TouchableOpacity
-                                    key={index}
-                                    onPress={() => navigation.navigate('TambahSoal', {id: exam.id, id_jenis_ujian: exam.id_jenis_ujian})} 
-                                    delayLongPress={500}
-                                    onLongPress={() => Alert.alert(
-                                        "Ujian akan dihapus",
-                                        "Apakah anda yakin ?",
-                                        [
-                                            { text: "Tidak" },
-                                            { text: "Ya", onPress: () => {
-                                                removeExam(exam.id)
-                                            }}
-                                        ]
-                                    )}
-                                    style={tw`w-full flex flex-row items-center justify-between bg-white rounded my-2 border border-gray-300 p-2`}
-                                >
-                                    <Text style={[tw`font-semibold text-black`, ]}>{exam.name}</Text>
-                                    <TouchableOpacity onPress={() => {
-                                        navigation.navigate('EditExam', {
-                                            id: exam.id
-                                        });
-                                    }}>
-                                        <Text style={tw`bg-green-500 text-white p-2 rounded`}>Edit</Text>
+            {exam_base_on_type.length > 0 ? (
+                <ScrollView style={tw`h-full p-4 bg-white`}>
+                    <View style={tw`flex flex-row flex-wrap justify-center`}>
+                            {exam_base_on_type.map((exam, index) => {
+                                return (
+                                    <TouchableOpacity
+                                        key={index}
+                                        onPress={() => navigation.navigate('TambahSoal', {id: exam.id, id_jenis_ujian: exam.id_jenis_ujian})} 
+                                        delayLongPress={500}
+                                        onLongPress={() => Alert.alert(
+                                            "Ujian akan dihapus",
+                                            "Apakah anda yakin ?",
+                                            [
+                                                { text: "Tidak" },
+                                                { text: "Ya", onPress: () => {
+                                                    removeExam(exam.id)
+                                                }}
+                                            ]
+                                        )}
+                                        style={tw`w-full flex flex-row items-center justify-between bg-white rounded my-2 border border-gray-300 p-2`}
+                                    >
+                                        <View style={tw``}>
+                                            <Text style={[tw`font-semibold text-black`, ]}>{exam.name}</Text>
+                                            <Text style={[tw`font-semibold text-black`, ]}>Mapel : {exam.mapel.name}</Text>
+                                            <Text style={[tw`font-semibold text-black`, ]}>Kelas : {exam.kelas.name}</Text>
+                                        </View>
+                                        {profile.id_jabatan != 3 ? (
+                                            <TouchableOpacity onPress={() => {
+                                                navigation.navigate('EditExam', {
+                                                    id: exam.id
+                                                });
+                                            }}>
+                                                <Text style={tw`bg-teal-500 text-white py-1 px-4 rounded`}>Edit</Text>
+                                            </TouchableOpacity>
+                                        ) : (
+                                            <Icon name={'angle-right'} size={25} color="#000000" />
+                                        )}
                                     </TouchableOpacity>
-                                </TouchableOpacity>
-                            )
-                        })
-                    ) : (
-                        <View style={tw`mt-8`}>
-                            <Image style={[customStyle.aspectSquare, tw`w-80 h-80`]} source={require('../assets/images/not-found.jpg')} />
-                        </View>
-                    )}
-                </View>
-            </ScrollView>
+                                )
+                            })}
+                    </View>
+                </ScrollView>
+            ) : (
+                <NotFound message="Data Belum Tersedia" />
+            )}
             
             <RBSheet
                 ref={refRBSheet}
@@ -202,7 +211,7 @@ const ListSoal = ({navigation, route}) => {
                         <Text style={tw`text-white text-center bg-gray-400 p-2 rounded w-full`}>Reset</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={filter} style={tw`w-1/2 p-2`}>
-                        <Text style={tw`text-white text-center bg-blue-500 p-2 rounded w-full`}>Filter</Text>
+                        <Text style={tw`text-white text-center bg-teal-500 p-2 rounded w-full`}>Filter</Text>
                     </TouchableOpacity>
                 </View>
             </RBSheet>

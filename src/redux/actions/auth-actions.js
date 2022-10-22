@@ -3,6 +3,7 @@ import axios from "axios";
 import { ToastAndroid } from "react-native";
 import { baseUrl } from "../../utils/global";
 import { UseGetAction } from "../../utils/use-get-action";
+import { UsePostAction } from "../../utils/use-post-action";
 
 import {
     SIGNIN,
@@ -209,189 +210,73 @@ export const getAllUser = () =>
         undefined,
     );
 
-export const getAllAdmin = () => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/all-admin`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        console.log("response data user : ", response.data);
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GET_ALL_ADMIN,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getAllAdmin = () => 
+    UseGetAction(
+        'all-admin',
+        GET_ALL_ADMIN, 
+        undefined,
+    );
 
-export const getAllSiswa = () => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/all-siswa`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        console.log("response data user : ", response.data);
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GET_ALL_SISWA,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+// export const getAllAdmin = () => {
+//     try{
+//         return async dispatch => {
+//             await AsyncStorage.getItem('userData')
+//             .then(value => {
+//                 if(value != null){
+//                     let data = JSON.parse(value);
+//                     axios.get(
+//                         `${baseUrl}/api/all-admin`, 
+//                         {
+//                             headers: {
+//                                 'Content-Type': 'application/json',
+//                                 'Authorization': 'Bearer ' + data.access_token
+//                             }
+//                         }
+//                     ).then(function(response){
+//                         console.log("response data user : ", response.data);
+//                         if(response.data.status === "success"){
+//                             dispatch({
+//                                 type: GET_ALL_ADMIN,
+//                                 payload: response.data.data,
+//                             });
+//                         }
+//                     }).catch(function(error){
+//                         console.log(error);
+//                     });
+//                 }
+//             })
+//         }
+//     }catch(error){
+//         console.log(error);
+//     }
+// }
 
-export const getAllGuru = () => {
-    try{
-        return async dispatch => {
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/all-guru`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GET_ALL_GURU,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getAllSiswa = () => 
+    UseGetAction(
+        'all-siswa',
+        GET_ALL_SISWA,
+        undefined,
+    );
 
-export const editProfileUser = (id, request) => async (dispatch) => {
-    try{
-        let token = "";
-        await AsyncStorage.getItem('userData')
-        .then(value => {
-            if(value != null){
-                let data = JSON.parse(value);
-                token = data.access_token;
-            }
-        });
+export const getAllGuru = () => 
+    UseGetAction(
+        'all-guru',
+        GET_ALL_GURU, 
+        undefined,
+    );
 
-        const req = axios.post(
-            `${baseUrl}/api/edit-user/${id}`, 
-            request,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': 'Bearer ' + token
-                }
-            }
-        ).then(function(response){
-            console.log("response : ", response.data);
-            if(response.data.status === "success"){
-                ToastAndroid.showWithGravityAndOffset(
-                    response.data.message,
-                    ToastAndroid.LONG,
-                    ToastAndroid.TOP,
-                    25,
-                    50
-                );
-            }else{
-                ToastAndroid.showWithGravityAndOffset(
-                    response.data.message,
-                    ToastAndroid.LONG,
-                    ToastAndroid.TOP,
-                    25,
-                    50
-                );
-            }
-            
-            return response.data;
-        }).catch(function(error){
-            console.log(error);
-        });
+export const editProfileUser = (data) => 
+    UsePostAction(
+        'edit-user',
+        EDIT_USER, 
+        undefined,
+        data,
+        true,
+    );
 
-        return req;
-    }catch(error){
-        console.log(error);
-    }
-}
-
-export const getTeacherById = (idKelas, idMapel) => {
-    try{
-        return async dispatch => {
-            console.log(`${baseUrl}/api/get-teacher-by-class-id/${idKelas}/${idMapel}`);
-            await AsyncStorage.getItem('userData')
-            .then(value => {
-                if(value != null){
-                    let data = JSON.parse(value);
-                    axios.get(
-                        `${baseUrl}/api/get-teacher-by-class-id/${idKelas}/${idMapel}`, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + data.access_token
-                            }
-                        }
-                    ).then(function(response){
-                        // console.log("data guru : ", response.data);
-                        if(response.data.status === "success"){
-                            dispatch({
-                                type: GETTEACHERBYID,
-                                payload: response.data.data,
-                            });
-                        }
-                    }).catch(function(error){
-                        console.log(error);
-                    });
-                }
-            })
-        }
-    }catch(error){
-        console.log(error);
-    }
-}
+export const getTeacherById = (id_kelas, id_mapel) => 
+    UseGetAction(
+        'get-teacher-by-class-id',
+        GETTEACHERBYID,
+        {id_kelas: id_kelas, id_mapel: id_mapel}
+    );

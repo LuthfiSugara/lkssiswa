@@ -17,14 +17,15 @@ import { customStyle } from '../utils/style';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { addMateri } from '../redux/actions/materi-actions';
+import Loader from '../components/loader';
 
 
 const TambahMateri = ({navigation}) => {
 
     const dispatch = useDispatch();
 
-    const {loading, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
-    const {teacher_by_id} = useSelector((state) => state.userReducer);
+    const {load_setting, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
+    const {load_auth, teacher_by_id} = useSelector((state) => state.userReducer);
 
     const [step, setStep] = useState(1);
     const [idMapel, setIdMapel] = useState(data_mapel.length > 0 ? data_mapel[0].id : "");
@@ -117,9 +118,9 @@ const TambahMateri = ({navigation}) => {
         }),
     });
 
-    console.log("teacher : ", teacher_by_id);
-
-    return (
+    return load_auth && load_setting ? (
+        <Loader />
+    ) : (
         <View style={tw`bg-white h-full`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => {
@@ -127,7 +128,7 @@ const TambahMateri = ({navigation}) => {
                 }}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Materi</Text>
+                <Text style={tw`text-center mr-5`}>Tambah Materi</Text>
                 <View></View>
             </View>
             
@@ -190,7 +191,7 @@ const TambahMateri = ({navigation}) => {
                             <Text style={tw`text-white text-center text-lg`}>Lanjut</Text>
                         </TouchableOpacity>
                     ) : (
-                        <TouchableOpacity onPress={() => setStep(2)} style={tw`bg-blue-500 py-2 rounded-lg mt-4`}>
+                        <TouchableOpacity onPress={() => setStep(2)} style={tw`bg-teal-500 py-2 rounded-lg mt-4`}>
                             <Text style={tw`text-white text-center text-lg`}>Lanjut</Text>
                         </TouchableOpacity>
                     )}            
@@ -269,7 +270,7 @@ const TambahMateri = ({navigation}) => {
             )}
             {step == 2 && <View style={[tw`px-4 mb-4`, customStyle.fixedBottom]}>
                 {loadBtn ? (
-                    <TouchableOpacity style={tw`w-full bg-blue-500 p-2 rounded`}>
+                    <TouchableOpacity style={tw`w-full bg-teal-500 p-2 rounded`}>
                         <ActivityIndicator color={"#ffffff"} />
                     </TouchableOpacity>
 
@@ -277,7 +278,7 @@ const TambahMateri = ({navigation}) => {
                     <TouchableOpacity onPress={() => {
                         handleSubmit();
                         setLoadBtn(true);
-                    }} style={tw`w-full bg-blue-500 p-2 rounded`}>
+                    }} style={tw`w-full bg-teal-500 p-2 rounded`}>
                         <Text style={tw`text-center text-white text-lg`}>Tambah Materi</Text>
                     </TouchableOpacity>
                 )}

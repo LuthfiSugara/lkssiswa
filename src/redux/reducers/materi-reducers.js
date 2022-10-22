@@ -4,7 +4,7 @@ import {
 } from "../types/materi";
 
 const initialState = {
-    loading: true,
+    load_materi: true,
     materi: [],
     detail_materi: [],
 }
@@ -14,14 +14,14 @@ const materiReducer = (state = initialState, action) => {
         case GETMATERI:
             return {
                 ...state,
-                loading: false,
-                materi: action.payload
+                load_materi: action.payload.loading,
+                materi: action.payload.data
             }
         case GETDETAILMATERI:
             return {
                 ...state,
-                loading: false,
-                detail_materi: action.payload
+                load_materi: action.payload.loading,
+                detail_materi: action.payload.data
             }
         default: 
             return state;

@@ -18,7 +18,7 @@ const TambahSoalEssay = ({navigation, route}) => {
         initialValues: {
             id_ujian: id_ujian,
             id_jenis_soal: 2,
-            pertanyaan: 'test pertanyaan essay',
+            pertanyaan: '',
             jawaban: '',
         },
         onSubmit: values => {
@@ -72,7 +72,7 @@ const TambahSoalEssay = ({navigation, route}) => {
                 <Pressable style={[customStyle.shadow, tw`py-2 px-4 rounded-full`]} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Tambah Soal Essay</Text>
+                <Text style={tw`text-center mr-5`}>Tambah Soal Essay</Text>
                 <View></View>
             </View>
 
@@ -99,7 +99,7 @@ const TambahSoalEssay = ({navigation, route}) => {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity onPress={handleSubmit} style={tw`w-full bg-blue-500 rounded p-2 mt-6`}>
+                    <TouchableOpacity onPress={handleSubmit} style={tw`w-full bg-teal-500 rounded p-2 mt-6`}>
                         <Text style={tw`text-white text-center`}>Tambah</Text>
                     </TouchableOpacity>
                 </View>

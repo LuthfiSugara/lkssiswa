@@ -5,13 +5,14 @@ import { Alert, Pressable, ScrollView, Text, TouchableOpacity, View } from 'reac
 import { useDispatch, useSelector } from 'react-redux';
 import { createExamResults, getExamBaseOnType } from '../redux/actions/exam-actions';
 import { getProfile } from '../redux/actions/auth-actions';
+import Loader from '../components/loader';
 
 const Exam = ({navigation, route}) => {
     const dispatch = useDispatch();
     const {type} = route.params;
 
-    const {exam_base_on_type} = useSelector((state) => state.examReducer);
-    const {profile} = useSelector((state) => state.userReducer);
+    const {load_exam, exam_base_on_type} = useSelector((state) => state.examReducer);
+    const {load_auth, profile} = useSelector((state) => state.userReducer);
 
     const loadData = async() => {
         dispatch(getExamBaseOnType(type, 'All', 'All', 'All'));
@@ -39,13 +40,15 @@ const Exam = ({navigation, route}) => {
         })
     }
 
-    return (
+    return load_exam && load_auth ? (
+        <Loader/>
+    ) : (
         <View>
             <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Soal</Text>
+                <Text style={tw`text-center mr-5`}>Soal</Text>
                 <View></View>
             </View>
             <ScrollView style={tw`h-full bg-white`}>
@@ -68,7 +71,11 @@ const Exam = ({navigation, route}) => {
                                     );
                                 }}
                             >
-                                <Text>{exam.name}</Text>
+                                <View>
+                                    <Text>{exam.name}</Text>
+                                    <Text>Mapel : {exam.mapel.name}</Text>
+                                    <Text>Kelas : {exam.kelas.name}</Text>
+                                </View>
                                 <Icon name={'angle-right'} size={25} color="#000000" />
                             </TouchableOpacity>
                         )

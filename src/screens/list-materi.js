@@ -8,21 +8,23 @@ import { getTeacherById } from '../redux/actions/auth-actions';
 import {Picker} from '@react-native-picker/picker';
 import { getMateri } from '../redux/actions/materi-actions';
 import { customStyle } from '../utils/style';
+import Loader from '../components/loader';
+import NotFound from '../components/not-found';
 
 const ListMateri = ({navigation}) => {
     const dispatch = useDispatch();
 
-    const {loading, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
-    const {teacher_by_id} = useSelector((state) => state.userReducer);
+    const {load_setting, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
+    const {load_auth, teacher_by_id} = useSelector((state) => state.userReducer);
     const {materi} = useSelector((state) => state.materiReducer);
 
     const [step, setStep] = useState(1);
-    const [idMapel, setIdMapel] = useState(data_mapel.length > 0 ? data_mapel[0].id : "");
-    const [idKelas, setIdKelas] = useState(data_kelas.length > 0 ? data_kelas[0].id : "");
-    const [idGuru, setIdGuru] = useState(teacher_by_id.length > 0 ? teacher_by_id[0].id_user : "");
-    const [mapelName, setMapelName] = useState(data_mapel.length > 0 ? data_mapel[0].name : "");
-    const [kelasName, setKelasName] = useState(data_kelas.length > 0 ? data_kelas[0].name : "");
-    const [teacherName, setTeacherName] = useState(teacher_by_id.length > 0 ? teacher_by_id[0].user.nama : "");
+    const [idMapel, setIdMapel] = useState("");
+    const [idKelas, setIdKelas] = useState("");
+    const [idGuru, setIdGuru] = useState("");
+    const [mapelName, setMapelName] = useState("");
+    const [kelasName, setKelasName] = useState("");
+    const [teacherName, setTeacherName] = useState("");
 
     const loadData = async() => {
         await dispatch(dataMapel());
@@ -32,6 +34,23 @@ const ListMateri = ({navigation}) => {
     useEffect(() => {
         loadData();
     }, []);
+
+    useEffect(() => {
+        if(data_mapel.length > 0){
+            setIdMapel(data_mapel[0].id);
+            setMapelName(data_mapel[0].name);
+        }
+
+        if(data_kelas.length > 0){
+            setIdKelas(data_kelas[0].id);
+            setKelasName(data_kelas[0].name);
+        }
+
+        if(teacher_by_id.length > 0){
+            setIdGuru(teacher_by_id[0].id_user);
+            setTeacherName(teacher_by_id[0].user.nama);
+        }
+    }, [data_kelas, data_mapel, teacher_by_id]);
     
     const loadTeacher = async() => {
         await dispatch(getTeacherById(idKelas, idMapel));
@@ -41,13 +60,6 @@ const ListMateri = ({navigation}) => {
             loadTeacher();
         }
     }, [idMapel, idKelas]);
-
-    useEffect(() => {
-        if(teacher_by_id.length > 0){
-            setIdGuru(teacher_by_id[0].id_user);
-            setTeacherName(teacher_by_id[0].user.nama);
-        }
-    }, [teacher_by_id]);
 
     const loadMateri = async() => {
         await dispatch(getMateri(idMapel, idKelas, idGuru));
@@ -62,13 +74,15 @@ const ListMateri = ({navigation}) => {
         });
     }
 
-    return (
+    return load_setting && load_auth ? (
+        <Loader />
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`py-2 px-4 rounded-full shadow bg-white`} onPress={() => { step === 1 ? navigation.goBack() : setStep(1)}}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>{step === 1 ? "Materi" : mapelName}</Text>
+                <Text style={tw`text-center mr-5`}>{step === 1 ? "Materi" : mapelName}</Text>
                 <View></View>
             </View>
             {step == 1 ? (
@@ -90,22 +104,26 @@ const ListMateri = ({navigation}) => {
                         </Picker>
                     </View>
                     
-                    <View style={tw`mb-4`}>
-                        <Text style={tw`mb-1`}>Pilih Kelas</Text>
-                        <Picker
-                            style={tw`shadow bg-white`}
-                            selectedValue={idKelas}
-                            onValueChange={(itemValue, itemIndex) =>{
-                                setIdKelas(itemValue)
-                                setKelasName(data_kelas[itemIndex].name);
-                            }}>
-                                {data_kelas.map((kelas, index) => {
-                                    return (
-                                        <Picker.Item label={kelas.name} value={kelas.id} key={index} />
-                                    )
-                                })}
-                        </Picker>
-                    </View>
+                    {data_kelas.length > 0 ? (
+                        <View style={tw`mb-4`}>
+                            <Text style={tw`mb-1`}>Pilih Kelas</Text>
+                            <Picker
+                                style={tw`shadow bg-white`}
+                                selectedValue={idKelas}
+                                onValueChange={(itemValue, itemIndex) =>{
+                                    setIdKelas(itemValue)
+                                    setKelasName(data_kelas[itemIndex].name);
+                                }}>
+                                    {data_kelas.map((kelas, index) => {
+                                        return (
+                                            <Picker.Item label={kelas.name} value={kelas.id} key={index} />
+                                        )
+                                    })}
+                            </Picker>
+                        </View>
+                    ) : (
+                        null
+                    )}
                     
                     {teacher_by_id.length > 0 ? (
                         <View style={tw`mb-4`}>
@@ -129,7 +147,7 @@ const ListMateri = ({navigation}) => {
                     )}
 
                     {teacher_by_id.length > 0 && idKelas != "" && idMapel != "" ? (
-                        <TouchableOpacity onPress={() => loadMateri()} style={tw`bg-blue-500 py-2 rounded-lg mt-4`}>
+                        <TouchableOpacity onPress={() => loadMateri()} style={tw`bg-teal-500 py-2 rounded-lg mt-4`}>
                             <Text style={tw`text-white text-center text-lg`}>Lanjut</Text>
                         </TouchableOpacity>
                     ) : (
@@ -138,30 +156,24 @@ const ListMateri = ({navigation}) => {
 
                 </View>
             ) : (
-                <ScrollView style={tw`mb-12`}>
-                    <View style={tw`px-4 mt-4`}>
-                        <Text style={tw`text-xl`}>Kelas : {kelasName}</Text>
-                        <Text style={tw`text-xl mb-4`}>Guru : {teacherName}</Text>
-                        {materi.length > 0 ? (
-                            materi.map((materi, index) => {
-                                return (
-                                    <TouchableOpacity onPress={() => redirectToDetailMateri(materi.id, index)} key={index} style={tw`flex flex-row justify-between items-center border border-gray-700 p-3 rounded mb-4`}>
-                                        <Text>{materi.judul}</Text>
-                                        <Icon name={'arrow-right'} size={25} color="#000000" />
-                                    </TouchableOpacity>
-                                )
-                            })
-                        ): (
-                            <View style={[tw`w-full`, customStyle.h100]}>
-                                <Image
-                                    style={tw`w-full h-100 mx-auto`}
-                                    source={require('../assets/images/not-found.jpg')}
-                                />
-                                <Text style={tw`text-center text-xl font-bold`}>Tidak dapat menemukan materi</Text>
-                            </View>
-                        )}
-                    </View>
-                </ScrollView>
+                materi.length > 0 ? (
+                    <ScrollView style={tw`mb-12`}>
+                        <View style={tw`px-4 mt-4`}>
+                            <Text style={tw`text-sm`}>Kelas : {kelasName}</Text>
+                            <Text style={tw`text-sm mb-4`}>Guru : {teacherName}</Text>
+                                {materi.map((materi, index) => {
+                                    return (
+                                        <TouchableOpacity onPress={() => redirectToDetailMateri(materi.id, index)} key={index} style={tw`flex flex-row justify-between items-center border border-gray-700 p-3 rounded mb-4`}>
+                                            <Text>{materi.judul}</Text>
+                                            <Icon name={'arrow-right'} size={25} color="#000000" />
+                                        </TouchableOpacity>
+                                    )
+                                })}
+                        </View>
+                    </ScrollView>
+                ) : (
+                    <NotFound message="Materi Belum Tersedia :(" />
+                )
             )}
         </View>
     )

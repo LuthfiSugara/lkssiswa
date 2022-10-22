@@ -10,6 +10,7 @@ import { customStyle } from '../utils/style';
 import { baseUrl } from '../utils/global';
 import ImageView from "react-native-image-viewing";
 import RNFetchBlob from 'rn-fetch-blob';
+import Loader from '../components/loader';
 
 const CorrectAnswer = ({navigation, route}) => {
     const {id_ujian, id_siswa} = route.params;
@@ -105,7 +106,6 @@ const CorrectAnswer = ({navigation, route}) => {
         let res = dispatch(updateStudentScore(data))
         .then(response => {
             if(response.status === "success"){
-                console.log("res : ", response);
                 navigation.goBack();
             }
         })
@@ -178,17 +178,14 @@ const CorrectAnswer = ({navigation, route}) => {
     
 
     return load_exam ? (
-        <View style={tw`flex flex-1 justify-center items-center`}>
-            <ActivityIndicator size="large" color="#ff1402" />
-            <Text style='text-center'>Loading....</Text>
-        </View>
+        <Loader/>
       ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`py-2 px-4 rounded-full shadow bg-white`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Koreksi Jawaban</Text>
+                <Text style={tw`text-center mr-5`}>Koreksi Jawaban</Text>
                 <TouchableOpacity 
                     onPress={() => { setUpdateAnswerModal(true) }}
                     style={tw`px-2`}
@@ -197,9 +194,9 @@ const CorrectAnswer = ({navigation, route}) => {
                 </TouchableOpacity>
             </View>
             <ScrollView>
-                <View style={tw`px-4`}>
-                    <Text style={tw`mt-4 text-lg`}>{correct_student_answer.name}</Text>
-                    <Text style={tw`my-2 text-lg`}>Nilai : {detail_score.nilai}</Text>
+                <View style={tw`px-4 mb-8`}>
+                    <Text style={tw`mt-4 text-sm`}>Nama : {correct_student_answer.name}</Text>
+                    <Text style={tw`my-2 text-sm`}>Nilai : {detail_score.nilai}</Text>
 
                     <Text style={tw`mt-3`}>Soal Pilihan Ganda</Text>
                     <View style={tw`flex flex-row items-center my-3`}>
@@ -209,7 +206,7 @@ const CorrectAnswer = ({navigation, route}) => {
                                     key={index}
                                     onPress={() => renderQuestion(index + 1, pg.id_jenis_soal, pg)}
                                 >
-                                    <Text style={tw`bg-teal-500 text-white mr-2 p-3 rounded`}>{index + 1}</Text>
+                                    <Text style={tw`bg-teal-500 text-white mr-2 px-3 py-2 rounded`}>{index + 1}</Text>
                                 </TouchableOpacity>
                             )
                         })}
@@ -223,14 +220,14 @@ const CorrectAnswer = ({navigation, route}) => {
                                     key={index}
                                     onPress={() => renderQuestion(index + 1, essay.id_jenis_soal, essay)}
                                 >
-                                    <Text style={tw`bg-teal-500 text-white mr-2 p-3 rounded`}>{index + 1}</Text>
+                                    <Text style={tw`bg-teal-500 text-white mr-2 px-3 py-2 rounded`}>{index + 1}</Text>
                                 </TouchableOpacity>
                             )
                         })}
                     </View>
 
-                    <View>
-                        <Text>{indexQuestion}. {question.pertanyaan}</Text>
+                    <View style={tw``}>
+                        <Text style={tw`my-4`}>{indexQuestion}. {question.pertanyaan}</Text>
                         {questionType == 1 &&
                             <View>
                                 <View style={tw`flex flex-row justify-between border-b border-gray-300 my-2`}>
@@ -307,16 +304,6 @@ const CorrectAnswer = ({navigation, route}) => {
                         )}
                          
                         {questionType == 2 ? (
-                            // <Text>{question.jawaban == 'a' ? (
-                            //     'a. ' + question.pilihan_a
-                            //     ) : question.jawaban == 'b' ? (
-                            //         'b. ' + question.pilihan_b
-                            // ) : question.jawaban == 'c' ? (
-                            //     'c. ' + question.pilihan_c
-                            //     ) : question.jawaban == 'd' ? (
-                            //         'd. ' + question.pilihan_d
-                            //     ) : null}</Text>
-                            // ) : (
                             <View>
                                 <Text style={tw`mt-3 mb-1`}>Koreksi Jawaban : </Text>
                                 <TextInput
@@ -374,7 +361,7 @@ const CorrectAnswer = ({navigation, route}) => {
                         onPress={() => {
                             updateNilaiSiswa();
                         }}
-                        style={tw`bg-blue-500 p-2 w-2/5 rounded-lg ml-1`}
+                        style={tw`bg-teal-500 p-2 w-2/5 rounded-lg ml-1`}
                       >
                         <Text style={tw`text-white text-center text-lg`}>Simpan</Text>
                       </TouchableOpacity>

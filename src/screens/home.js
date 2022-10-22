@@ -89,7 +89,7 @@ const Home = ({navigation}) => {
                 source={require('../assets/images/user.jpg')}
               />
               <Text style={tw`font-semibold text-black text-center my-2`}>Data Pengguna</Text>
-            </TouchableOpacity>  
+            </TouchableOpacity>
           }
           
           <TouchableOpacity 

@@ -3,7 +3,7 @@ import {
 } from "../types/class";
 
 const initialState = {
-    loading: true,
+    load_class: true,
     detail_kelas: [],
 }
 
@@ -12,8 +12,8 @@ const classReducer = (state = initialState, action) => {
         case DETAILKELAS:
             return {
                 ...state,
-                loading: false,
-                detail_kelas: action.payload
+                loading: action.payload.loading,
+                detail_kelas: action.payload.data
             }
         default: 
             return state;

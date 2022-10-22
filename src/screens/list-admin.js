@@ -6,12 +6,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getAllAdmin } from '../redux/actions/auth-actions';
 import { baseUrl } from "../utils/global";
 import { useIsFocused } from "@react-navigation/native";
+import Loader from "../components/loader";
 
 const ListAdmin = ({navigation}) => {
     const dispatch = useDispatch();
     const isFocused = useIsFocused();
 
-    const {loading, list_admin} = useSelector((state) => state.userReducer);
+    const {load_auth, list_admin} = useSelector((state) => state.userReducer);
 
     const loadData = async() => {
         await dispatch(getAllAdmin());
@@ -28,20 +29,22 @@ const ListAdmin = ({navigation}) => {
         })
     }
 
-    return (
+    return load_auth ? (
+        <Loader/>
+    ) : (
         <View style={tw`h-full bg-white`}>
             <View style={tw`flex flex-row justify-between items-center p-2`}>
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center text-lg mr-5`}>Admin</Text>
+                <Text style={tw`text-center mr-5`}>Admin</Text>
                 <Pressable 
                     onPress={() => navigation.navigate('TambahAdmin', {
                             'idJabatan' : 1,
                     })}
                     style={tw`py-2 px-4`}
                 >
-                    <Icon name={'plus'} size={25} color="#2196f3" />
+                    <Icon name={'plus-square'} size={25} color="#000000" />
                 </Pressable>
             </View>
 
@@ -50,7 +53,7 @@ const ListAdmin = ({navigation}) => {
                     return (
                         <Pressable 
                             onPress={() => redirectToDetail(user.id, user.id_jabatan)} 
-                            style={tw`flex flex-row justify-between pr-4 items-center rounded-lg m-4 shadow`} key={index}
+                            style={tw`flex flex-row justify-between pr-4 items-center rounded-lg m-4`} key={index}
                         >
                             <View style={tw`flex flex-row items-center`}>
                                 <View style={tw`mr-2`}>
@@ -60,8 +63,8 @@ const ListAdmin = ({navigation}) => {
                                     />
                                 </View>
                                 <View style={tw`ml-2`}>
-                                    <Text style={tw`text-xl text-black font-bold`}>{user.nama}</Text>
-                                    <Text style={tw`text-lg font-semibold`}>{user.username}</Text>
+                                    <Text style={tw`text-lg text-black font-bold`}>{user.nama}</Text>
+                                    <Text style={tw`text-xs font-semibold`}>{user.username}</Text>
                                 </View>
                             </View>
                             <Icon name={'angle-right'} size={25} color="#000000" />

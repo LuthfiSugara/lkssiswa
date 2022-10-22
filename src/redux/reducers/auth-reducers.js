@@ -64,26 +64,26 @@ const userReducer = (state = initialState, action) => {
         case GET_ALL_USER:
             return {
                 ...state,
-                load_auth: false,
-                list_user: action.payload
+                load_auth: action.payload.loading,
+                list_user: action.payload.data
             }
         case GET_ALL_ADMIN:
             return {
                 ...state,
-                load_auth: false,
-                list_admin: action.payload
+                load_auth: action.payload.loading,
+                list_admin: action.payload.data
             }
         case GET_ALL_GURU:
             return {
                 ...state,
-                load_auth: false,
-                list_guru: action.payload
+                load_auth: action.payload.loading,
+                list_guru: action.payload.data
             }
         case GET_ALL_SISWA:
             return {
                 ...state,
-                load_auth: false,
-                list_siswa: action.payload
+                load_auth: action.payload.loading,
+                list_siswa: action.payload.data
             }
         case GET_DETAIL_USER:
             return {
@@ -94,8 +94,8 @@ const userReducer = (state = initialState, action) => {
         case GETTEACHERBYID:
             return {
                 ...state,
-                load_auth: false,
-                teacher_by_id: action.payload
+                load_auth: action.payload.loading,
+                teacher_by_id: action.payload.data
             }
         default: 
             return state;

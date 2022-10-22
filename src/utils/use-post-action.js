@@ -2,7 +2,7 @@ import { API } from './config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ToastAndroid } from 'react-native';
 
-export const UsePostAction = (url, type, queries, request) => async(dispatch) => {
+export const UsePostAction = (url, type, queries, request, isFile) => async(dispatch) => {
     try{
         let qr = '?';
         if(queries != undefined){
@@ -21,7 +21,14 @@ export const UsePostAction = (url, type, queries, request) => async(dispatch) =>
             }
         });
         
-        const config = {
+        let config = {};
+
+        isFile ? config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': 'Bearer ' + token
+            }
+        } : config = {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
@@ -29,7 +36,7 @@ export const UsePostAction = (url, type, queries, request) => async(dispatch) =>
         };
         
         const response = await API.post(url, request, config);
-        console.log("response : ", response);
+        console.log("response post : ", response);
         if(response.data.status == 'success'){
             ToastAndroid.showWithGravityAndOffset(
                 response.data.message,
