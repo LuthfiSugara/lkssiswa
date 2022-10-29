@@ -113,6 +113,18 @@ const Home = ({navigation}) => {
             />
             <Text style={tw`font-semibold text-black text-center my-2`}>E-LKS</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Nilai')}
+            style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+          >
+            <Image
+              style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
+              source={require('../assets/images/score.jpg')}
+            />
+            <Text style={tw`font-semibold text-black text-center my-2`}>Nilai</Text>
+          </TouchableOpacity>
+
           {profile.id_jabatan == 1 && 
             <TouchableOpacity 
               onPress={() => navigation.navigate('Setting')}
@@ -127,15 +139,15 @@ const Home = ({navigation}) => {
           }
 
           <TouchableOpacity 
-            onPress={() => navigation.navigate('Nilai')}
-            style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
-          >
-            <Image
-              style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
-              source={require('../assets/images/score.jpg')}
-            />
-            <Text style={tw`font-semibold text-black text-center my-2`}>Nilai</Text>
-          </TouchableOpacity>
+              onPress={() => navigation.navigate('SchoolProfile')}
+              style={[tw`w-1/2 py-2 px-2 my-2 items-center rounded-xl border border-gray-500`, customStyle.w45]}
+            >
+              <Image
+                style={[tw`rounded-lg w-30 h-30`, customStyle.aspectSquare]}
+                source={require('../assets/images/logo.png')}
+              />
+              <Text style={tw`font-semibold text-black text-center my-2`}>Profile Sekolah</Text>
+            </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
