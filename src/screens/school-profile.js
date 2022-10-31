@@ -3,7 +3,7 @@ import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
-const SchoolProfile = () => {
+const SchoolProfile = ({navigation}) => {
     return (
         <View style={tw`flex-1 justify-center`}>
             <View style={tw`flex flex-row justify-between bg-white items-center p-2`}>

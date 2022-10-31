@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createExamResults, getExamBaseOnType } from '../redux/actions/exam-actions';
 import { getProfile } from '../redux/actions/auth-actions';
 import Loader from '../components/loader';
+import { format } from 'date-fns';
 
 const Exam = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -59,22 +60,31 @@ const Exam = ({navigation, route}) => {
                                 key={index} 
                                 style={tw`flex flex-row justify-between items-center border border-gray-300 p-3 mb-4 rounded`}
                                 onPress={() => {
-                                    Alert.alert(
-                                        `Anda akan mengerjakan soal ${exam.name}`,
-                                        "Apakah anda yakin ?",
-                                        [
-                                            { text: "Tidak" },
-                                            { text: "Ya", onPress: () => {
-                                                createExam(exam.id);
-                                            }}
-                                        ]
-                                    );
+                                    exam.can_start ? (
+                                        Alert.alert(
+                                            `Anda akan mengerjakan soal ${exam.name}`,
+                                            "Apakah anda yakin ?",
+                                            [
+                                                { text: "Tidak" },
+                                                { text: "Ya", onPress: () => {
+                                                    createExam(exam.id);
+                                                }}
+                                            ]
+                                        )
+                                    ) : (
+                                        Alert.alert(
+                                            `Ujian ${exam.name} telah berakhir`,
+                                            "Anda tidak dapat mengerjakan soal ini lagi",
+                                        )
+                                    )
                                 }}
                             >
                                 <View>
                                     <Text>{exam.name}</Text>
                                     <Text>Mapel : {exam.mapel.name}</Text>
                                     <Text>Kelas : {exam.kelas.name}</Text>
+                                    <Text>Mulai : {format(new Date(exam.from), 'dd/MM/yyyy HH:mm:ss')}</Text>
+                                    <Text>Sampai : {format(new Date(exam.to), 'dd/MM/yyyy HH:mm:ss')}</Text>
                                 </View>
                                 <Icon name={'angle-right'} size={25} color="#000000" />
                             </TouchableOpacity>
