@@ -131,11 +131,20 @@ const Soal = ({navigation, route}) => {
             setFieldValue('id_kelas', data_kelas[0].id);
         }
 
+        // if(teacher_by_id.length > 0){
+        //     setIdGuru(teacher_by_id[0].id_user);
+        //     setFieldValue('id_guru', teacher_by_id[0].id_user);
+        // }
+    }, [data_mapel, data_kelas, 
+        // teacher_by_id
+    ]);
+
+    useEffect(() => {
         if(teacher_by_id.length > 0){
             setIdGuru(teacher_by_id[0].id_user);
             setFieldValue('id_guru', teacher_by_id[0].id_user);
         }
-    }, [data_mapel, data_kelas, teacher_by_id]);
+    }, [teacher_by_id]);
 
     const onChangeDateFrom = (event, selectedDate) => {
         setDateFrom(selectedDate);
@@ -192,6 +201,8 @@ const Soal = ({navigation, route}) => {
     const showPicker = (mode, name) => {
         showMode(mode, name);
     };
+
+    console.log("teacher : ", teacher_by_id);
 
     return load_setting && load_auth ? (
         <Loader/>
@@ -294,8 +305,11 @@ const Soal = ({navigation, route}) => {
                             <Picker
                                 style={tw`shadow bg-white`}
                                 selectedValue={values.id_mapel}
-                                onValueChange={(itemValue, itemIndex) =>
+                                onValueChange={(itemValue, itemIndex) => {
                                     setFieldValue('id_mapel', itemValue)
+                                    setIdMapel(itemValue);
+
+                                }
                                 }>
                                     {data_mapel.map((mapel, index) => {
                                         return (
@@ -310,8 +324,10 @@ const Soal = ({navigation, route}) => {
                             <Picker
                                 style={tw`shadow bg-white`}
                                 selectedValue={values.id_kelas}
-                                onValueChange={(itemValue, itemIndex) =>
+                                onValueChange={(itemValue, itemIndex) =>{
                                     setFieldValue('id_kelas', itemValue)
+                                    setIdKelas(itemValue);
+                                }
                                 }>
                                     {data_kelas.map((kelas, index) => {
                                         return (
@@ -327,8 +343,10 @@ const Soal = ({navigation, route}) => {
                                 <Picker
                                     style={tw`shadow bg-white`}
                                     selectedValue={values.id_guru}
-                                    onValueChange={(itemValue, itemIndex) =>
+                                    onValueChange={(itemValue, itemIndex) => {
                                         setFieldValue('id_guru', itemValue)
+                                        setIdGuru(itemValue);
+                                    }
                                     }>
                                         {teacher_by_id.map((guru, index) => {
                                             return (
