@@ -43,6 +43,7 @@ import NilaiSiswa from "../screens/nilai-siswa";
 import { SafeAreaView } from "react-native";
 import NilaiSiswaDetail from "../screens/nilai-siswa-detail";
 import CorrectAnswer from "../screens/correct-answer";
+import SchoolProfile from "../screens/school-profile";
 
 
 const Stack = createNativeStackNavigator();
@@ -331,6 +332,13 @@ const Navigation = () => {
                     <Stack.Screen
                         name='CorrectAnswer'
                         component={CorrectAnswer}
+                        options={{
+                            headerShown:false
+                        }}
+                    />
+                    <Stack.Screen
+                        name='SchoolProfile'
+                        component={SchoolProfile}
                         options={{
                             headerShown:false
                         }}

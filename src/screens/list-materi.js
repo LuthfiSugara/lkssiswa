@@ -33,6 +33,7 @@ const ListMateri = ({navigation}) => {
     
     useEffect(() => {
         loadData();
+        
     }, []);
 
     useEffect(() => {
@@ -45,12 +46,27 @@ const ListMateri = ({navigation}) => {
             setIdKelas(data_kelas[0].id);
             setKelasName(data_kelas[0].name);
         }
+    }, [data_kelas, data_mapel])
+
+    useEffect(() => {
+        // if(data_mapel.length > 0){
+        //     setIdMapel(data_mapel[0].id);
+        //     setMapelName(data_mapel[0].name);
+        // }
+
+        // if(data_kelas.length > 0){
+        //     setIdKelas(data_kelas[0].id);
+        //     setKelasName(data_kelas[0].name);
+        // }
 
         if(teacher_by_id.length > 0){
             setIdGuru(teacher_by_id[0].id_user);
             setTeacherName(teacher_by_id[0].user.nama);
         }
-    }, [data_kelas, data_mapel, teacher_by_id]);
+    }, [
+        // data_kelas, 
+        // data_mapel, 
+        teacher_by_id]);
     
     const loadTeacher = async() => {
         await dispatch(getTeacherById(idKelas, idMapel));
@@ -92,10 +108,11 @@ const ListMateri = ({navigation}) => {
                         <Picker
                             style={tw`shadow bg-white`}
                             selectedValue={idMapel}
-                            onValueChange={(itemValue, itemIndex) =>{
+                            onValueChange={(itemValue, itemIndex) => {
                                 setIdMapel(itemValue)
                                 setMapelName(data_mapel[itemIndex].name)
-                            }}>
+                            }
+                            }>
                                 {data_mapel.map((mapel, index) => {
                                     return (
                                         <Picker.Item label={mapel.name} value={mapel.id} key={index} />
@@ -125,9 +142,10 @@ const ListMateri = ({navigation}) => {
                         null
                     )}
                     
-                    {teacher_by_id.length > 0 ? (
                         <View style={tw`mb-4`}>
                             <Text style={tw`mb-1`}>Pilih Guru</Text>
+
+                        {teacher_by_id.length > 0 ? (
                             <Picker
                                 style={tw`shadow bg-white`}
                                 selectedValue={idGuru}
@@ -141,10 +159,10 @@ const ListMateri = ({navigation}) => {
                                         )
                                     })}
                             </Picker>
+                        ) : (
+                            <Text style={tw`border border-gray-300 text-teal-500 p-2 rounded-lg`}>Tidak ditemukan guru yang mengajar {mapelName} di {kelasName}</Text>
+                        )}
                         </View>
-                    ) : (
-                        null
-                    )}
 
                     {teacher_by_id.length > 0 && idKelas != "" && idMapel != "" ? (
                         <TouchableOpacity onPress={() => loadMateri()} style={tw`bg-teal-500 py-2 rounded-lg mt-4`}>
