@@ -1,1 +1,1 @@
-export const baseUrl ="https://cf5b-114-122-14-173.ap.ngrok.io";
+export const baseUrl ="https://26eb-103-154-148-59.ap.ngrok.io";
