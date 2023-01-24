@@ -85,8 +85,9 @@ const ExamWork = ({navigation, route}) => {
 
     useEffect(() => {
         getLocation().then((tmpLocation) => {
+            console.log("location : ", tmpLocation.coords);
             if(tmpLocation != undefined){
-                if(tmpLocation.latitude > 3.491555 && tmpLocation < 98.586125){
+                if(tmpLocation.coords.latitude > 3.491555 && tmpLocation.coords.latitude < 3.495596 && tmpLocation.coords.longitude < 98.586125 && tmpLocation.coords.longitude < 98.589296){
                     setLocation('Sekolah');
                 }else{
                     setLocation('Luar Sekolah');
