@@ -311,6 +311,8 @@ const TambahSoal = ({navigation, route}) => {
                         </View>
                     )}
                 </View>
+                
+
             </ScrollView>
             <View style={tw`m-4`}>
                 {soal === "pg" ? (

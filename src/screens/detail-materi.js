@@ -11,6 +11,7 @@ import { baseUrl } from '../utils/global';
 import { useIsFocused } from "@react-navigation/native";
 import Loader from '../components/loader';
 import { getProfile } from '../redux/actions/auth-actions';
+import VideoPlayer from 'react-native-video-player';
 
 const DetailMateri = ({navigation, route}) => {
     const {id, mapel_name, schedule} = route.params;
@@ -117,7 +118,9 @@ const DetailMateri = ({navigation, route}) => {
                             </TouchableOpacity>
                         </View>
                     ) : null}
-                    {detail_materi?.detail?.map((detail, index) => {
+
+                    <Text style={tw`my-2 border-b border-gray-300 pb-1`}>Materi Gambar</Text>
+                    {detail_materi?.detail_image?.map((detail, index) => {
                         return (
                             <View key={index} style={tw`flex flex-row justify-between mb-2 pb-1 border-b border-gray-300`}>
                                 <Text>File Pendukung {index + 1}</Text>
@@ -130,6 +133,21 @@ const DetailMateri = ({navigation, route}) => {
                             </View>
                         )
                     })}
+
+                    <Text style={tw`my-2 border-b border-gray-300 pb-1`}>Materi Video</Text>
+                    {detail_materi?.detail_video?.map((detail, index) => {
+                        return (
+                            <View key={index} style={tw`my-2`}>
+                                <VideoPlayer
+                                    video={{ uri: baseUrl + detail.name }}
+                                    videoWidth={1600}
+                                    videoHeight={900}
+                                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                                />
+                            </View>
+                        )
+                    })}
+
                     <View style={tw`h-96 my-4`}>
                         <Text style={tw`text-sm`}>Keterangan</Text>
                         <WebView 

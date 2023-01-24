@@ -21,6 +21,7 @@ const EditMateri = ({navigation, route}) => {
     const dispatch = useDispatch();
     const RichText = useRef();
     const [fileMateri, setFileMateri] = useState([]);
+    const [videoMateri, setVideoMateri] = useState([]);
     const [loadBtn, setLoadBtn] = useState(false);
 
     const {load_materi, detail_materi} = useSelector((state) => state.materiReducer);
@@ -46,6 +47,19 @@ const EditMateri = ({navigation, route}) => {
         }
     }, []);
 
+    const handleVideoSelection = useCallback(async () => {
+        try {
+            const response = await DocumentPicker.pickMultiple({
+                presentationStyle: 'fullScreen',
+                type: [DocumentPicker.types.allFiles],
+                allowMultiSelection: true,
+            });
+            setVideoMateri(response);
+        } catch (err) {
+            console.log(err);
+        }
+    }, []);
+
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
             judul: detail_materi.judul,
@@ -61,6 +75,16 @@ const EditMateri = ({navigation, route}) => {
                         uri: fileMateri[i].uri,
                         type: fileMateri[i].type,
                         name: fileMateri[i].name,
+                    });
+                }
+            }
+
+            if(videoMateri.length > 0){
+                for (let i = 0; i < videoMateri.length; i++) {
+                    formData.append('video[]', {
+                        uri: videoMateri[i].uri,
+                        type: videoMateri[i].type,
+                        name: videoMateri[i].name,
                     });
                 }
             }
@@ -119,7 +143,7 @@ const EditMateri = ({navigation, route}) => {
 
                     <View style={tw`mb-4`}>
                         <Text style={tw`mb-2 text-gray-800`}>Materi</Text>
-                        {detail_materi.detail.map((detail, index) => {
+                        {detail_materi.detail_image.map((detail, index) => {
                             return (
                                 <TouchableOpacity 
                                     key={index} 
@@ -143,6 +167,37 @@ const EditMateri = ({navigation, route}) => {
                             )
                         })}
                         <TouchableOpacity onPress={handleDocumentSelection} style={[tw`w-full bg-blue-800 p-8 mt-4 rounded flex flex-col items-center`, customStyle.bgDarkBlue]}>
+                            <Icon name={'folder-plus'} size={35} color="#ffffff" />
+                            <Text style={tw`text-white font-bold`}>Upload file</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={tw`mb-4`}>
+                        <Text style={tw`mb-2 text-gray-800`}>Materi Video</Text>
+                        {detail_materi.detail_video.map((detail, index) => {
+                            return (
+                                <TouchableOpacity 
+                                    key={index} 
+                                    style={tw`flex flex-row justify-between border-b border-gray-300 mb-2 pb-1`}
+                                    onPress={() => {
+                                        Alert.alert(
+                                            "Hapus file materi",
+                                            "Apakah anda yakin ?",
+                                            [
+                                                { text: "Tidak" },
+                                                { text: "Ya", onPress: () => {
+                                                    triggerDeleteFileMateri(detail.id)
+                                                }}
+                                            ]
+                                        );
+                                    }}
+                                >
+                                    <Text>{detail_materi.judul} {"video-"} {index + 1}</Text>
+                                    <Icon name={'trash-alt'} size={20} color="#000000" style={tw`px-2`} />
+                                </TouchableOpacity>
+                            )
+                        })}
+                        <TouchableOpacity onPress={handleVideoSelection} style={[tw`w-full bg-blue-800 p-8 mt-4 rounded flex flex-col items-center`, customStyle.bgDarkBlue]}>
                             <Icon name={'folder-plus'} size={35} color="#ffffff" />
                             <Text style={tw`text-white font-bold`}>Upload file</Text>
                         </TouchableOpacity>

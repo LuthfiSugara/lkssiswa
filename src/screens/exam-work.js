@@ -11,6 +11,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import { getProfile } from '../redux/actions/auth-actions';
 import { useIsFocused } from "@react-navigation/native";
 import Loader from '../components/loader';
+import { getLocation } from 'react-native-weather-api';
 
 const ExamWork = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -24,6 +25,7 @@ const ExamWork = ({navigation, route}) => {
     const [loadPage, setLoadPage] = useState(false);
     const [essayAnswer, setEssayAnswer] = useState('');
     const [detail, setDetail] = useState([]);
+    const [location, setLocation] = useState(location);
 
     const {load_exam, exam_results_answer, exam_pg, exam_essay, detail_question} = useSelector((state) => state.examReducer);
 
@@ -80,6 +82,34 @@ const ExamWork = ({navigation, route}) => {
         }
         return status;
     }
+
+    useEffect(() => {
+        getLocation().then((tmpLocation) => {
+            if(tmpLocation != undefined){
+                if(tmpLocation.latitude > 3.491555 && tmpLocation < 98.586125){
+                    setLocation('Sekolah');
+                }else{
+                    setLocation('Luar Sekolah');
+                }
+            }
+                // 3.495964, 98.586405
+                // 3.495893, 98.588825
+                // 3.495858, 98.588860
+    
+                // 3.495014, 98.589296
+                // 3.493632, 98.589210
+                // 3.492100, 98.589202
+    
+                // 3.491563, 98.588852
+                // 3.491555, 98.587699
+                // 3.491706, 98.586445
+    
+                // 3.492521, 98.586327
+                // 3.494084, 98.586150
+                // 3.495596, 98.586125
+            
+        });   
+    }, []);
 
     const checkPermission = async (fileUrl) => {
     
@@ -160,6 +190,7 @@ const ExamWork = ({navigation, route}) => {
 
             <ScrollView style={tw`h-full bg-white`}>
                 <View style={tw`px-4 mt-4 mb-8`}>
+                    <Text style={tw`font-bold`}>Lokasi : {location}</Text>
                     {exam_pg.length > 0 && 
                         <View style={tw`mt-2`}>
                             <Text style={tw`mb-2`}>Soal pilihan ganda</Text>

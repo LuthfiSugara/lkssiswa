@@ -208,13 +208,15 @@ const Soal = ({navigation, route}) => {
             <ScrollView style={tw`p-4 bg-white`}>
                 {step === 1 ? (
                     <View style={tw`flex flex-row flex-wrap justify-center`}>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('ListSoal', {type: id_soal})} 
-                            style={[tw`w-full flex flex-row justify-between p-3 m-2 border border-gray-300 rounded`]}
-                        >
-                            <Text style={tw`text-black`}>Daftar Soal</Text>
-                            <Icon name={'angle-right'} size={20} color="#000000" />
-                        </TouchableOpacity>
+                        {profile.id_jabatan != 3 ? (
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('ListSoal', {type: id_soal})} 
+                                style={[tw`w-full flex flex-row justify-between p-3 m-2 border border-gray-300 rounded`]}
+                            >
+                                <Text style={tw`text-black`}>Daftar Soal</Text>
+                                <Icon name={'angle-right'} size={20} color="#000000" />
+                            </TouchableOpacity>
+                        ) : null}
 
                         {profile.id_jabatan != 3 ? (
                             <TouchableOpacity

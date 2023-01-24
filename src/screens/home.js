@@ -9,7 +9,6 @@ import { baseUrl } from '../utils/global';
 import { customStyle } from '../utils/style';
 import Loader from '../components/loader';
 
-
 const Home = ({navigation}) => {
 
   const dispatch = useDispatch();

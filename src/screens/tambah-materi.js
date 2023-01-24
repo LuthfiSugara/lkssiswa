@@ -32,6 +32,7 @@ const TambahMateri = ({navigation}) => {
     const [idKelas, setIdKelas] = useState(data_kelas.length > 0 ? data_kelas[0].id : "");
     const [idGuru, setIdGuru] = useState(teacher_by_id.length > 0 ? teacher_by_id[0].id_user : "");
     const [fileMateri, setFileMateri] = useState([]);
+    const [fileVideo, setFileVideo] = useState([]);
     const [loadBtn, setLoadBtn] = useState(false);
     const [teacherName, setTeacherName] = useState(teacher_by_id.length > 0 ? teacher_by_id[0].user.nama : "");
 
@@ -76,6 +77,19 @@ const TambahMateri = ({navigation}) => {
         }
     }, []);
 
+    const handleVideoSelection = useCallback(async () => {
+        try {
+            const response = await DocumentPicker.pickMultiple({
+                presentationStyle: 'fullScreen',
+                type: [DocumentPicker.types.allFiles],
+                allowMultiSelection: true,
+            });
+            setFileVideo(response);
+        } catch (err) {
+            console.log(err);
+        }
+    }, []);
+
     const {values, setFieldValue, handleSubmit, handleReset, errors, touched} = useFormik({
         initialValues: {
             judul: '',
@@ -97,6 +111,16 @@ const TambahMateri = ({navigation}) => {
                         uri: fileMateri[i].uri,
                         type: fileMateri[i].type,
                         name: fileMateri[i].name,
+                    });
+                }
+            }
+
+            if(fileVideo.length > 0){
+                for (let i = 0; i < fileVideo.length; i++) {
+                    formData.append('video[]', {
+                        uri: fileVideo[i].uri,
+                        type: fileVideo[i].type,
+                        name: fileVideo[i].name,
                     });
                 }
             }
@@ -198,7 +222,7 @@ const TambahMateri = ({navigation}) => {
 
                 </View>
             ) : (
-                <ScrollView style={tw`px-4 mt-8 h-full`}>
+                <ScrollView style={tw`px-4 my-12 h-full`}>
                     <View>
                         <View style={tw`mb-4`}>
                             <Text style={tw`mb-1 text-gray-800`}>Judul</Text>
@@ -217,6 +241,14 @@ const TambahMateri = ({navigation}) => {
                             <TouchableOpacity onPress={handleDocumentSelection} style={[tw`w-full bg-blue-800 p-8 rounded flex flex-col items-center`, customStyle.bgDarkBlue]}>
                                 <Icon name={'folder-plus'} size={35} color="#ffffff" />
                                 <Text style={tw`text-white font-bold`}>Upload file</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={tw`mb-4`}>
+                            <Text style={tw`mb-1 text-gray-800`}>Materi Video</Text>
+                            <TouchableOpacity onPress={handleVideoSelection} style={[tw`w-full bg-blue-800 p-8 rounded flex flex-col items-center`, customStyle.bgDarkBlue]}>
+                                <Icon name={'folder-plus'} size={35} color="#ffffff" />
+                                <Text style={tw`text-white font-bold`}>Upload Video</Text>
                             </TouchableOpacity>
                         </View>
 
