@@ -87,27 +87,48 @@ const ExamWork = ({navigation, route}) => {
         getLocation().then((tmpLocation) => {
             console.log("location : ", tmpLocation.coords);
             if(tmpLocation != undefined){
-                if(tmpLocation.coords.latitude > 3.491555 && tmpLocation.coords.latitude < 3.495596 && tmpLocation.coords.longitude < 98.586125 && tmpLocation.coords.longitude < 98.589296){
+                // // Kampus
+                // if(tmpLocation.coords.latitude > 3.491555 && tmpLocation.coords.latitude < 3.495596 && tmpLocation.coords.longitude > 98.586125 && tmpLocation.coords.longitude < 98.589296){
+
+                // // Sekolah
+                // if(tmpLocation.coords.latitude > 3.664971 && tmpLocation.coords.latitude < 3.665520 && tmpLocation.coords.longitude > 98.796432 && tmpLocation.coords.longitude < 98.797081){
+
+                // Lokasi Saat Ini
+                if(tmpLocation.coords.latitude == 3,61588 && tmpLocation.coords.longitude == 98,69943){
                     setLocation('Sekolah');
                 }else{
                     setLocation('Luar Sekolah');
                 }
             }
-                // 3.495964, 98.586405
-                // 3.495893, 98.588825
-                // 3.495858, 98.588860
-    
-                // 3.495014, 98.589296
-                // 3.493632, 98.589210
-                // 3.492100, 98.589202
-    
-                // 3.491563, 98.588852
-                // 3.491555, 98.587699
-                // 3.491706, 98.586445
-    
-                // 3.492521, 98.586327
-                // 3.494084, 98.586150
-                // 3.495596, 98.586125
+
+            // Kampus
+            // 3.495964, 98.586405
+            // 3.495893, 98.588825
+            // 3.495858, 98.588860
+
+            // 3.495014, 98.589296
+            // 3.493632, 98.589210
+            // 3.492100, 98.589202
+
+            // 3.491563, 98.588852
+            // 3.491555, 98.587699
+            // 3.491706, 98.586445
+
+            // 3.492521, 98.586327
+            // 3.494084, 98.586150
+            // 3.495596, 98.586125
+
+            // Sekolah
+            // 3.665493, 98.796465
+            // 3.665515, 98.796857
+            // 3.665520, 98.797064
+
+            // 3.665226, 98.796465
+            // 3.664971, 98.796432
+            // 3.664987, 98.796743
+
+            // 3.665009, 98.797081
+            // 3.665281, 98.797026
             
         });   
     }, []);
