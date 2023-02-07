@@ -3,7 +3,7 @@ import tw from 'twrnc';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDetailQuestion, getExamQuestionsEssay, getExamQuestionsPG, getExamResults, getExamResultsAnswer, getExamResultsDetail, updateExamResultsAnswer } from '../redux/actions/exam-actions';
+import { getDetailQuestion, getExamQuestionsEssay, getExamQuestionsPG, getExamResults, getExamResultsAnswer, getExamResultsDetail, getLocationExam, updateExamResultsAnswer } from '../redux/actions/exam-actions';
 import { customStyle } from '../utils/style';
 import { baseUrl } from '../utils/global';
 import ImageView from "react-native-image-viewing";
@@ -15,7 +15,7 @@ import { getLocation } from 'react-native-weather-api';
 
 const ExamWork = ({navigation, route}) => {
     const dispatch = useDispatch();
-    const {id_ujian, id_siswa} = route.params;
+    const {id_ujian, id_siswa, id_location} = route.params;
     const isFocused = useIsFocused();
 
     const [imagesPeview, setImagePreview] = useState([]);
@@ -25,18 +25,24 @@ const ExamWork = ({navigation, route}) => {
     const [loadPage, setLoadPage] = useState(false);
     const [essayAnswer, setEssayAnswer] = useState('');
     const [detail, setDetail] = useState([]);
-    const [location, setLocation] = useState(location);
+    const [locationName, setLocationName] = useState("");
 
-    const {load_exam, exam_results_answer, exam_pg, exam_essay, detail_question} = useSelector((state) => state.examReducer);
+    const {load_exam, exam_results_answer, exam_pg, exam_essay, detail_question, location_exam} = useSelector((state) => state.examReducer);
 
-    const loadData = () => {
-        dispatch(getExamQuestionsPG(id_ujian, 1));
-        dispatch(getExamQuestionsEssay(id_ujian, 2));
+    const loadData = async() => {
+        await dispatch(getExamQuestionsPG(id_ujian, 1));
+        await dispatch(getExamQuestionsEssay(id_ujian, 2));
+        const loadLocation = await dispatch(getLocationExam(id_ujian, id_siswa));
+        if(loadLocation.status == 'success'){
+            setLocationName(loadLocation.data.detail.name);
+        }
         // if(exam_pg.length > 0){
         //     dispatch(getDetailQuestion(exam_pg[0].id));
         //     dispatch(getExamResultsAnswer(id_siswa, id_ujian, exam_pg[0].id));
         // }
     }
+
+    console.log('location : ', location_exam);
 
     useEffect(() => {
         loadData();
@@ -82,56 +88,6 @@ const ExamWork = ({navigation, route}) => {
         }
         return status;
     }
-
-    useEffect(() => {
-        getLocation().then((tmpLocation) => {
-            console.log("location : ", tmpLocation.coords);
-            if(tmpLocation != undefined){
-                // // Kampus
-                // if(tmpLocation.coords.latitude > 3.491555 && tmpLocation.coords.latitude < 3.495596 && tmpLocation.coords.longitude > 98.586125 && tmpLocation.coords.longitude < 98.589296){
-
-                // // Sekolah
-                // if(tmpLocation.coords.latitude > 3.664971 && tmpLocation.coords.latitude < 3.665520 && tmpLocation.coords.longitude > 98.796432 && tmpLocation.coords.longitude < 98.797081){
-
-                // Lokasi Saat Ini
-                if(tmpLocation.coords.latitude == 3,61588 && tmpLocation.coords.longitude == 98,69943){
-                    setLocation('Sekolah');
-                }else{
-                    setLocation('Luar Sekolah');
-                }
-            }
-
-            // Kampus
-            // 3.495964, 98.586405
-            // 3.495893, 98.588825
-            // 3.495858, 98.588860
-
-            // 3.495014, 98.589296
-            // 3.493632, 98.589210
-            // 3.492100, 98.589202
-
-            // 3.491563, 98.588852
-            // 3.491555, 98.587699
-            // 3.491706, 98.586445
-
-            // 3.492521, 98.586327
-            // 3.494084, 98.586150
-            // 3.495596, 98.586125
-
-            // Sekolah
-            // 3.665493, 98.796465
-            // 3.665515, 98.796857
-            // 3.665520, 98.797064
-
-            // 3.665226, 98.796465
-            // 3.664971, 98.796432
-            // 3.664987, 98.796743
-
-            // 3.665009, 98.797081
-            // 3.665281, 98.797026
-            
-        });   
-    }, []);
 
     const checkPermission = async (fileUrl) => {
     
@@ -212,7 +168,7 @@ const ExamWork = ({navigation, route}) => {
 
             <ScrollView style={tw`h-full bg-white`}>
                 <View style={tw`px-4 mt-4 mb-8`}>
-                    <Text style={tw`font-bold`}>Lokasi : {location}</Text>
+                    <Text style={tw`font-bold`}>Lokasi : {locationName}</Text>
                     {exam_pg.length > 0 && 
                         <View style={tw`mt-2`}>
                             <Text style={tw`mb-2`}>Soal pilihan ganda</Text>

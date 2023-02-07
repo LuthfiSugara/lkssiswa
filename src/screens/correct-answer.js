@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Image, PermissionsAndroid, Modal, Pressable, 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch, useSelector } from 'react-redux';
 import tw from 'twrnc';
-import { correctStudentAnswer, detailAnswer, detailScore, updateDetailAnswer, updateStudentScore } from '../redux/actions/exam-actions';
+import { correctStudentAnswer, detailAnswer, detailScore, getLocationExam, updateDetailAnswer, updateStudentScore } from '../redux/actions/exam-actions';
 import DocumentPicker from "react-native-document-picker";
 import { isImage } from '../utils/function';
 import { customStyle } from '../utils/style';
@@ -30,12 +30,17 @@ const CorrectAnswer = ({navigation, route}) => {
     const [updateAnswer, setUpdateAnswer] = useState("");
     const [updateAnswerModal, setUpdateAnswerModal] = useState(false);
     const [nilaiSiswa, setNilaiSiswa] = useState(0);
+    const [locationName, setLocationName] = useState("");
     
     const {load_exam, correct_student_answer, detail_score, detail_answer} = useSelector((state) => state.examReducer);
 
     const loadData = async() => {
         await dispatch(correctStudentAnswer(id_ujian));
         await dispatch(detailScore(id_ujian, id_siswa));
+        const loadLocation = await dispatch(getLocationExam(id_ujian, id_siswa));
+        if(loadLocation.status == 'success'){
+            setLocationName(loadLocation.data.detail.name);
+        }
     }
 
     useEffect(() => {
@@ -195,6 +200,7 @@ const CorrectAnswer = ({navigation, route}) => {
             </View>
             <ScrollView>
                 <View style={tw`px-4 mb-8`}>
+                    <Text style={tw`mt-4 text-sm`}>Lokasi : {locationName}</Text>
                     <Text style={tw`mt-4 text-sm`}>Nama : {correct_student_answer.name}</Text>
                     <Text style={tw`my-2 text-sm`}>Nilai : {detail_score.nilai}</Text>
 

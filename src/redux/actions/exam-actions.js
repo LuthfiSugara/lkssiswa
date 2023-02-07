@@ -18,6 +18,7 @@ import {
     UPDATE_STUDENT_SCORE,
     UPDATE_DETAIL_ANSWER,
     CREATEEXAM,
+    GET_LOCATION_EXAM,
 } from "../types/exam";
 import { ToastAndroid } from "react-native";
 import { UseGetAction } from "../../utils/use-get-action";
@@ -550,4 +551,61 @@ export const updateStudentScore = (data) =>
         undefined,
         data,
         false,
+    );
+
+export const createLocationExam = (request) => async (dispatch) => {
+    try{
+        let token = "";
+        await AsyncStorage.getItem('userData')
+        .then(value => {
+            if(value != null){
+                let data = JSON.parse(value);
+                token = data.access_token;
+            }
+        });
+
+        const req = axios.post(
+            `${baseUrl}/api/create-location-exam`, 
+            request,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }
+        ).then(function(response){
+            if(response.data.status === "success"){
+                ToastAndroid.showWithGravityAndOffset(
+                    response.data.message,
+                    ToastAndroid.LONG,
+                    ToastAndroid.TOP,
+                    25,
+                    50
+                );
+            }else{
+                ToastAndroid.showWithGravityAndOffset(
+                    response.data.message,
+                    ToastAndroid.LONG,
+                    ToastAndroid.TOP,
+                    25,
+                    50
+                );
+            }
+            
+            return response.data;
+        }).catch(function(error){
+            console.log(error);
+        });
+
+        return req;
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export const getLocationExam = (id_ujian, id_siswa) => 
+    UseGetAction(
+        'get-location-exam',
+        GET_LOCATION_EXAM,
+        {id_ujian: id_ujian, id_siswa: id_siswa}
     );

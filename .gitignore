@@ -62,4 +62,4 @@ buck-out/
 /ios/Pods/
 /vendor/bundle/
 
- src/utils/global.js
+ /src/utils/global.js

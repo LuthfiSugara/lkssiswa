@@ -12,6 +12,7 @@ import {
     CORRECT_STUDENT_ANSWER,
     DETAIL_SCORE,
     DETAIL_ANSWER,
+    GET_LOCATION_EXAM,
 } from "../types/exam";
 
 const initialState = {
@@ -28,6 +29,7 @@ const initialState = {
     correct_student_answer: [],
     detail_score: [],
     detail_answer: [],
+    location_exam: [],
 }
 
 const examReducer = (state = initialState, action) => {
@@ -103,6 +105,12 @@ const examReducer = (state = initialState, action) => {
                 ...state,
                 load_exam: action.payload.loading,
                 detail_answer: action.payload.data
+            }
+        case GET_LOCATION_EXAM:
+            return {
+                ...state,
+                load_exam: action.payload.loading,
+                location_exam: action.payload.data
             }
         default: 
             return state;
