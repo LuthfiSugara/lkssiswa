@@ -22,7 +22,6 @@ const ExamWork = ({navigation, route}) => {
     const [previewVisible, setIsPreviewVisible] = useState(false);
     const [statusDownload, setStatusDownload] = useState(false);
     const [numberOfQuestion, setnumberOfQuestion] = useState('1');
-    const [loadPage, setLoadPage] = useState(false);
     const [essayAnswer, setEssayAnswer] = useState('');
     const [detail, setDetail] = useState([]);
     const [locationName, setLocationName] = useState("");

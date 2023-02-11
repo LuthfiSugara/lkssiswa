@@ -24,7 +24,6 @@ const Exam = ({navigation, route}) => {
 
     useEffect(() => {
         loadData();
-        console.log("load");
         getLocation().then((tmpLocation) => {
             console.log("location : ", tmpLocation.coords);
             if(tmpLocation != undefined){
