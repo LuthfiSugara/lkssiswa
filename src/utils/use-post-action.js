@@ -36,7 +36,7 @@ export const UsePostAction = (url, type, queries, request, isFile) => async(disp
         };
         
         const response = await API.post(url, request, config);
-        console.log("response post : ", response);
+        
         if(response.data.status == 'success'){
             ToastAndroid.showWithGravityAndOffset(
                 response.data.message,

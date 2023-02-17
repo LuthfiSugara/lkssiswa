@@ -56,7 +56,6 @@ export const deleteFileMateri = (id) => async (dispatch) => {
                 }
             }
         ).then(function(response){
-            console.log("response : ", response.data);
             if(response.data.status === "success"){
                 ToastAndroid.showWithGravityAndOffset(
                     response.data.message,

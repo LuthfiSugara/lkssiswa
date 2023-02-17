@@ -89,9 +89,6 @@ const EditSoalPG = ({navigation, route}) => {
         }),
     });
 
-    console.log("load : ", load_exam);
-    console.log("detail : ", detail_question);
-
     useEffect(() => {
         if(detail_question.length > 0){
             setFieldValue('pertanyaan', detail_question[0].pertanyaan);

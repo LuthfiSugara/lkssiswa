@@ -33,8 +33,6 @@ const DetailMateri = ({navigation, route}) => {
         loadData();
     }, [isFocused]);
 
-    console.log("profile : ", profile);
-
     const checkPermission = async () => {
         
         if (Platform.OS === 'ios') {
@@ -89,7 +87,6 @@ const DetailMateri = ({navigation, route}) => {
         config(options)
         .fetch('GET', FILE_URL)
         .then(res => {
-            console.log('res -> ', JSON.stringify(res));
             Alert.alert('Download materi', 'Download Berhasil.');
         });
     };

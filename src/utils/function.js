@@ -18,7 +18,6 @@ export const checkPermission = async (fileUrl) => {
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                 downloadFile(fileUrl);
-                console.log('Storage Permission Granted.');
             } else {
                 Alert.alert('Error','Storage Permission Not Granted');
             }
@@ -56,7 +55,7 @@ export const downloadFile = (fileUrl) => {
     config(options)
     .fetch('GET', FILE_URL)
     .then(res => {
-        // console.log('res -> ', JSON.stringify(res));
+
         Alert.alert('Download materi', 'Download Berhasil.');
     });
 };

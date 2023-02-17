@@ -32,6 +32,7 @@ const ExamWork = ({navigation, route}) => {
         await dispatch(getExamQuestionsPG(id_ujian, 1));
         await dispatch(getExamQuestionsEssay(id_ujian, 2));
         const loadLocation = await dispatch(getLocationExam(id_ujian, id_siswa));
+        console.log('location : ', loadLocation);
         if(loadLocation.status == 'success'){
             setLocationName(loadLocation.data.detail.name);
         }
@@ -40,8 +41,6 @@ const ExamWork = ({navigation, route}) => {
         //     dispatch(getExamResultsAnswer(id_siswa, id_ujian, exam_pg[0].id));
         // }
     }
-
-    console.log('location : ', location_exam);
 
     useEffect(() => {
         loadData();
@@ -105,7 +104,6 @@ const ExamWork = ({navigation, route}) => {
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     setStatusDownload(true);
                     downloadFile(fileUrl);
-                    console.log('Storage Permission Granted.');
                 } else {
                     Alert.alert('Error','Storage Permission Not Granted');
                 }

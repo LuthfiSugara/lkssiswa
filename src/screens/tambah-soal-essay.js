@@ -38,7 +38,6 @@ const TambahSoalEssay = ({navigation, route}) => {
                 }
             }
 
-            console.log("form : ", formData);
             dispatch(createExamQuestions(formData))
             .then(response => {
                 if(response.status === "success"){

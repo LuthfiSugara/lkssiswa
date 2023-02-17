@@ -53,8 +53,6 @@ const CorrectAnswer = ({navigation, route}) => {
         }
     }, [detail_score]);
 
-    console.log("nilai : ", nilaiSiswa);
-
     useEffect(() => {
         if(Object.keys(correct_student_answer).length > 0){
             setPgQuesetion(correct_student_answer.pg);
@@ -133,7 +131,6 @@ const CorrectAnswer = ({navigation, route}) => {
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     setStatusDownload(true);
                     downloadFile(fileUrl);
-                    console.log('Storage Permission Granted.');
                 } else {
                     Alert.alert('Error','Storage Permission Not Granted');
                 }

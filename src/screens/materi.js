@@ -21,8 +21,6 @@ const Materi = ({navigation}) => {
         loadData();
     }, []);
 
-    console.log("profile : ", profile);
-
     return load_auth ? (
         <Loader/>
     ) : (

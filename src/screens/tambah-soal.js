@@ -39,7 +39,7 @@ const TambahSoal = ({navigation, route}) => {
         }else{
             setSoalName("Kuis");
         }
-        console.log("test");
+        
         loadData();
     }, [isFocused]);
 
@@ -94,7 +94,7 @@ const TambahSoal = ({navigation, route}) => {
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     setStatusDownload(true);
                     downloadFile(fileUrl);
-                    console.log('Storage Permission Granted.');
+                    
                 } else {
                     Alert.alert('Error','Storage Permission Not Granted');
                 }
@@ -141,8 +141,6 @@ const TambahSoal = ({navigation, route}) => {
     const getFileExtention = (fileUrl) => {
         return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
     };
-
-    console.log("load exam : ", load_exam);
 
     return load_exam ? (
         <Loader/>

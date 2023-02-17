@@ -194,7 +194,6 @@ const EditGuru = ({navigation, route}) => {
 
     const onSelectBottomSheet = (select) => {
         setSelected(select);
-        console.log("select : ", select);
         refRBSheet.current.open();
     }
 
@@ -204,7 +203,6 @@ const EditGuru = ({navigation, route}) => {
             setArrKelas(filteredArray);
             var filteredKelasName = selectArrKelasName.filter(function(e) { return e !== name });
             setSelectArrKelasName(filteredKelasName);
-            console.log("kelas : ", filteredArray);
         }else{
             setArrKelas((arr) => [...arr, idKelas]);
             setSelectArrKelasName((arrName) => [...arrName, name]);

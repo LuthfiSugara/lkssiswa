@@ -280,7 +280,6 @@ const TambahAdmin = ({navigation, route}) => {
                                 setIsFocus(false);
                                 setFieldValue('id_jenis_kelamin', item.value);
                                 setGender(item.label);
-                                console.log()
                             }}
                         />
                     </View>

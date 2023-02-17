@@ -100,7 +100,7 @@ const TambahSiswa = ({navigation, route}) => {
                     name: foto.assets[0].fileName,
                 });
             }
-            console.log("form : ",formData);
+            
             dispatch(register(formData))
             .then(response => {
                 if(response.status === "success"){
@@ -182,7 +182,7 @@ const TambahSiswa = ({navigation, route}) => {
 
     const onSelectBottomSheet = (select) => {
         setSelected(select);
-        console.log("select : ", select);
+        
         refRBSheet.current.open();
     }
     
@@ -316,7 +316,6 @@ const TambahSiswa = ({navigation, route}) => {
                                 setIsFocus(false);
                                 setFieldValue('id_jenis_kelamin', item.value);
                                 setGender(item.label);
-                                console.log()
                             }}
                         />
                     </View>

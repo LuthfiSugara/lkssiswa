@@ -15,8 +15,11 @@ const NilaiSiswaDetail = ({navigation, route}) => {
     const isFocused = useIsFocused();
 
     const {load_exam, student_score_detail} = useSelector((state) => state.examReducer);
+    const {load_auth, profile} = useSelector((state) => state.userReducer);
+    
     const [detail, setDetail] = useState([]);
     const [mapel, setMapel] = useState([]);
+    const [jenisUjian, setJenisUjian] = useState(0);
 
     const loadData = async() => {
         await dispatch(getStudentScoreDetail(id_ujian));
@@ -30,6 +33,7 @@ const NilaiSiswaDetail = ({navigation, route}) => {
         if(student_score_detail.length > 0){
             setDetail(student_score_detail[0].nilai);
             setMapel(student_score_detail[0].mapel);
+            setJenisUjian(student_score_detail[0].id_jenis_ujian);
         }
     }, [student_score_detail]);
 
@@ -40,6 +44,7 @@ const NilaiSiswaDetail = ({navigation, route}) => {
         });
     }
 
+    console.log('jenis ujian : ', jenisUjian);
     return load_exam ? (
         <Loader/>
       ) : (
@@ -61,20 +66,22 @@ const NilaiSiswaDetail = ({navigation, route}) => {
                                     <Text>{"Nilai : "} {detail.nilai}</Text>
                                     <Text>{"Mapel : "} {mapel.name}</Text>
                                     <Text>
-                                        {student_score_detail.id_jenis_ujian == 1 ? (
+                                        {jenisUjian == 1 ? (
                                             "Ulangan"
-                                        ) : student_score_detail.id_jenis_ujian == 1 ? (
-                                            "Latihan"
-                                        ) : student_score_detail.id_jenis_ujian == 1 ? (
+                                        ) : jenisUjian == 2 ? (
+                                            "Latihan"   
+                                        ) : jenisUjian == 3 ? (
                                             "Tugas"
                                         ) : (
                                             "Kuis"
                                         )}
                                     </Text>
                                 </View>
-                                <TouchableOpacity onPress={() => redirectToCorrectAnswer(detail.id_siswa)}>
-                                    <Text style={tw`bg-teal-500 text-white p-2 rounded`}>Koreksi</Text>
-                                </TouchableOpacity>
+                                {profile.id_jabatan != 3 ? (
+                                    <TouchableOpacity onPress={() => redirectToCorrectAnswer(detail.id_siswa)}>
+                                        <Text style={tw`bg-teal-500 text-white p-2 rounded`}>Koreksi</Text>
+                                    </TouchableOpacity>
+                                ) : null}
                             </View>
                         )
                     })}

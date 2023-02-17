@@ -49,7 +49,7 @@ const ListMapel = ({navigation}) => {
     const editMapel = () => {
         const formData = new FormData();
         formData.append('nama', ubahMapel);
-        console.log(formData + idMapel)
+        
         dispatch(editMataPelajaran(formData, idMapel))
         .then(response => {
             if(response.status === "success"){

@@ -36,7 +36,7 @@ export const UseGetAction = (url, type, queries) => async(dispatch) => {
         };
 
         const response = await API(url, config);
-        console.log("response : ", response.data);
+        
         if(response.data.status == 'success'){
             await dispatch({
                 type: type,

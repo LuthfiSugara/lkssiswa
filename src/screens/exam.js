@@ -11,12 +11,12 @@ import { getLocation } from 'react-native-weather-api';
 
 const Exam = ({navigation, route}) => {
     const dispatch = useDispatch();
-    const {type} = route.params;
+    const {type, soalName} = route.params;
     const [location, setLocation] = useState(1);
 
     const {load_exam, exam_base_on_type} = useSelector((state) => state.examReducer);
     const {load_auth, profile} = useSelector((state) => state.userReducer);
-
+    console.log('id location : ', location);
     const loadData = async() => {
         dispatch(getExamBaseOnType(type, 'All', 'All', 'All'));
         dispatch(getProfile());
@@ -25,7 +25,7 @@ const Exam = ({navigation, route}) => {
     useEffect(() => {
         loadData();
         getLocation().then((tmpLocation) => {
-            console.log("location : ", tmpLocation.coords);
+            
             if(tmpLocation != undefined){
                 // // Kampus
                 if(tmpLocation.coords.latitude > 3.491555 && tmpLocation.coords.latitude < 3.495596 && tmpLocation.coords.longitude > 98.586125 && tmpLocation.coords.longitude < 98.589296){
@@ -35,9 +35,9 @@ const Exam = ({navigation, route}) => {
     
                 // Lokasi Saat Ini
                 // if(tmpLocation.coords.latitude == 3,57920 && tmpLocation.coords.longitude == 98,70035){
-                    setLocation(1);
-                }else{
                     setLocation(2);
+                }else{
+                    setLocation(1);
                 }
             }
             
@@ -58,8 +58,7 @@ const Exam = ({navigation, route}) => {
 
         const createExam = await dispatch(createExamResults(data));
         const createLocation = await dispatch(createLocationExam(dataLocation));
-        console.log('exam create : ', createExam);
-        console.log('exam location : ', createLocation);
+        
         // .then(response => {
         if(createExam.status === "success" && createLocation.status === "success"){
             navigation.navigate('ExamWork', {
@@ -79,7 +78,7 @@ const Exam = ({navigation, route}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center mr-5`}>Soal {location}</Text>
+                <Text style={tw`text-center mr-5`}>Soal {soalName}asd</Text>
                 <View></View>
             </View>
             <ScrollView style={tw`h-full bg-white`}>

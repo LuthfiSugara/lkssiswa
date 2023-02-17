@@ -32,8 +32,6 @@ const ListGuru = ({navigation}) => {
       })
     }
 
-    console.log("guru : ", list_guru);
-
     return load_auth ? (
         <Loader />
     ) : (

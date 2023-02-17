@@ -24,7 +24,6 @@ import {
 export const signIn = (data) => {
     try{
         return async dispatch => {
-            console.log(`utils : ${baseUrl}/api/login`);
             axios.post( 
                 `${baseUrl}/api/login`, 
                 data,
@@ -154,7 +153,6 @@ export const register = (request) => async (dispatch) => {
                 }
             }
         ).then(function(response){
-            console.log("response : ", response.data);
             if(response.data.status === "success"){
                 ToastAndroid.showWithGravityAndOffset(
                     response.data.message,

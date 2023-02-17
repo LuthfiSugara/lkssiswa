@@ -85,7 +85,6 @@ const TambahUser = ({navigation}) => {
         if(kelas.includes(idKelas)){
             var filteredArray = kelas.filter(function(e) { return e !== idKelas });
             setKelas(filteredArray);
-            console.log(filteredArray);
         }else{
             setKelas((arrKelas) => [...arrKelas, idKelas]);
         }
@@ -124,8 +123,6 @@ const TambahUser = ({navigation}) => {
 
                     }}
                     onSubmit={(values) => {
-                        console.log(kelas);
-
                         const formData = new FormData();
                         formData.append('nama_lengkap', values.nama_lengkap);
                         formData.append('username', values.username);

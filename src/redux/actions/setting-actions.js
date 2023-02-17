@@ -42,7 +42,6 @@ export const tambahKelas = (request) => async (dispatch) => {
                 }
             }
         ).then(function(response){
-            console.log("response : ", response.data);
             if(response.data.status === "success"){
                 ToastAndroid.showWithGravityAndOffset(
                     response.data.message,
@@ -75,7 +74,7 @@ export const tambahKelas = (request) => async (dispatch) => {
 export const editKelas = (request, id) => async (dispatch) => {
     try{
         let token = "";
-        console.log(`${baseUrl}/api/edit-kelas/${id}`);
+        
         await AsyncStorage.getItem('userData')
         .then(value => {
             if(value != null){
@@ -94,7 +93,6 @@ export const editKelas = (request, id) => async (dispatch) => {
                 }
             }
         ).then(function(response){
-            console.log("response : ", response.data);
             if(response.data.status === "success"){
                 ToastAndroid.showWithGravityAndOffset(
                     response.data.message,
@@ -141,7 +139,6 @@ export const dataJK = () =>
 export const dataJabatan = () => {
     try{
         return async dispatch => {
-            console.log(`${baseUrl}/api/jabatan`);
             await AsyncStorage.getItem('userData')
             .then(value => {
                 if(value != null){
@@ -200,7 +197,6 @@ export const addNewMapel = (request) => async (dispatch) => {
                 }
             }
         ).then(function(response){
-            console.log("response : ", response.data);
             if(response.data.status === "success"){
                 ToastAndroid.showWithGravityAndOffset(
                     response.data.message,
@@ -233,7 +229,7 @@ export const addNewMapel = (request) => async (dispatch) => {
 export const editMataPelajaran = (request, id) => async (dispatch) => {
     try{
         let token = "";
-        console.log(`${baseUrl}/api/edit-mapel/${id}`);
+        
         await AsyncStorage.getItem('userData')
         .then(value => {
             if(value != null){

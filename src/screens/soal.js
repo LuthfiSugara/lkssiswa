@@ -21,7 +21,6 @@ const Soal = ({navigation, route}) => {
     const [soalName, setSoalName] = useState("");
     const [step, setStep] = useState(1);
 
-
     const {load_setting, data_mapel, data_kelas} = useSelector((state) => state.settingReducer);
     const {load_auth, teacher_by_id, profile} = useSelector((state) => state.userReducer);
 
@@ -202,8 +201,6 @@ const Soal = ({navigation, route}) => {
         showMode(mode, name);
     };
 
-    console.log("teacher : ", teacher_by_id);
-
     return load_setting && load_auth ? (
         <Loader/>
     ) : (
@@ -242,7 +239,8 @@ const Soal = ({navigation, route}) => {
                         {profile.id_jabatan == 3 ? (
                             <TouchableOpacity
                                 onPress={() => navigation.navigate('Exam', {
-                                    type: id_soal
+                                    type: id_soal,
+                                    soalName: soalName
                                 })} 
                                 style={[tw`w-full flex flex-row justify-between p-3 m-2 border border-gray-300 rounded`]}
                             >

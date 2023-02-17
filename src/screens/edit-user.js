@@ -64,8 +64,6 @@ const EditUser = ({navigation, route}) => {
     const [showDate, setShowDate] = useState(false);
     const [foto, setFoto] = useState(null);
 
-    console.log(userId);
-
     const onChangeDate = (event, selectedDate) => {
         const currentDate = selectedDate || date;
         setDate(currentDate);
@@ -134,7 +132,7 @@ const EditUser = ({navigation, route}) => {
                                     name: foto.assets[0].fileName,
                                 })
                             }
-                        //    console.log("formdata : ",formData); 
+
                             const result = dispatch(editProfileUser(userId, formData))
                             .then(response => {
                                 console.log("res : ", response);

@@ -32,8 +32,6 @@ const ListSiswa = ({navigation}) => {
         })
     }
 
-    console.log("siswa : ", list_siswa.length);
-
   return load_auth ? (
     <Loader />
   ) : (
