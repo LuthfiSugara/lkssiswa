@@ -61,7 +61,6 @@ const EditExam = ({navigation, route}) => {
         onSubmit: values => {
             values.from = format(new Date(dateFrom), 'yyyy-MM-dd') + ' ' + format(new Date(timeFrom), 'HH:mm:ss');
             values.to = format(new Date(dateTo), 'yyyy-MM-dd') + ' ' + format(new Date(timeTo), 'HH:mm:ss');
-            console.log("values : ", values);
 
             dispatch(updateExam(values, id))
             .then(response => {
