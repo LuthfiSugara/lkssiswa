@@ -78,7 +78,7 @@ const Exam = ({navigation, route}) => {
                 <Pressable style={tw`shadow-lg bg-white py-2 px-4 rounded-full`} onPress={() => navigation.goBack()}>
                     <Icon name={'angle-left'} size={25} color="#000000" />
                 </Pressable>
-                <Text style={tw`text-center mr-5`}>Soal {soalName}asd</Text>
+                <Text style={tw`text-center mr-5`}>Soal {soalName}</Text>
                 <View></View>
             </View>
             <ScrollView style={tw`h-full bg-white`}>

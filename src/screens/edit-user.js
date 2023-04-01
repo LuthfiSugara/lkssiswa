@@ -87,7 +87,6 @@ const EditUser = ({navigation, route}) => {
     }
     return (
         <View style={styles.container}>
-            {/* <Text>asd</Text> */}
             <ScrollView>
                 <View style={tw`flex flex-row justify-between items-center p-2`}>
                     <Pressable 

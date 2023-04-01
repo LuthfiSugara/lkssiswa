@@ -202,7 +202,7 @@ const ExamWork = ({navigation, route}) => {
                                                 setnumberOfQuestion(index + 1);
                                             }}
                                         >
-                                            <Text style={tw`${exam?.result?.jawaban_siswa != null ? 'bg-teal-500' : 'bg-gray-500' } text-white text-center p-2 rounded`}>{exam.id}</Text>
+                                            <Text style={tw`${exam?.result?.jawaban_siswa != null ? 'bg-teal-500' : 'bg-gray-500' } text-white text-center p-2 rounded`}>{index + 1}</Text>
                                         </TouchableOpacity>
                                         
                                     )
